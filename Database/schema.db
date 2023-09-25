@@ -1,23 +1,15 @@
- users {
+Table users {
   id integer [primary key]
   username varchar
-  role varchar
+  password varchar
   created_at timestamp
+  project_ids list
 }
-
-Table posts {
-  id integer [primary key]
-  title varchar
-  body text [note: 'Content of the post']
-  user_id integer
-  status varchar
-  created_at timestamp
-}
-
-
 
 Table resources {
   id integer [primary key]
+  capacity integer 
+  availability integer
   title varchar
   type varchar
   created_at timestamp
@@ -25,4 +17,12 @@ Table resources {
 
 Table projects {
   id integer [primary key]
+  title varchar
+  description varchar
+  user_ids list
+  creator integer // userid
+  resources list // [resource id -> quantity] length: number of total resources
 }
+
+
+
