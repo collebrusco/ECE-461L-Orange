@@ -1,0 +1,28 @@
+ users {
+  id integer [primary key]
+  username varchar
+  role varchar
+  created_at timestamp
+}
+
+Table posts {
+  id integer [primary key]
+  title varchar
+  body text [note: 'Content of the post']
+  user_id integer
+  status varchar
+  created_at timestamp
+}
+
+
+
+Table resources {
+  id integer [primary key]
+  title varchar
+  type varchar
+  created_at timestamp
+}
+
+Table projects {
+  id integer [primary key]
+}
