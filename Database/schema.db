@@ -1,3 +1,4 @@
+// https://github.com/collebrusco/ECE-461L-Orange/blob/main/Database/schema.db
 Table users {
   id integer [primary key]
   username varchar
