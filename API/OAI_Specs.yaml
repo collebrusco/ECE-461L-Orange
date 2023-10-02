@@ -110,10 +110,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/requestBodies/UserArray'          
-            application/xml:
-              schema:
-                $ref: '#/components/requestBodies/UserArray'
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'          
         '401':
           description: Unauthorized. JWT Token is missing or invalid
       security:
@@ -167,7 +166,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
         '401':
           description: Unauthorized. JWT token is missing or invalid.
   /resource/{userId}:
@@ -192,7 +193,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
         '401':
           description: Unauthorized. JWT token is missing or invalid.
 components:
