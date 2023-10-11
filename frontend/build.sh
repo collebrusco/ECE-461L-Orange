@@ -5,4 +5,4 @@ docker build -t orange:frontend --network=host .
 docker run --name frontend orange:frontend
 
 # Copy static files to backend directory
-docker cp frontend:/frontend/build ../flask_container
+docker cp frontend:/frontend/build ../backend
