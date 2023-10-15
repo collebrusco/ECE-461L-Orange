@@ -7,12 +7,21 @@ import {
 } from "react-router-dom";
 import UserManagement from "./pages/UserManagement";
 import ResourceManagement from "./pages/ResourceManagement";
+import { RequireAuth } from "./components/AuthProvider";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
-      <Route index path="user" element={<UserManagement />} />
-      <Route path="resource" element={<ResourceManagement />} />
+      <Route index path="user" element={
+        <RequireAuth>
+          <UserManagement />
+        </RequireAuth>
+      }/>
+      <Route path="resource" element={
+        <RequireAuth>
+          <ResourceManagement />
+        </RequireAuth>
+      }/>
       <Route path="*" element={<Navigate to="user" replace />} />
     </Route>
   )

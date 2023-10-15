@@ -1,86 +1,89 @@
 import React from "react";
-import { useLocation, Navigate } from "react-router-dom";
 import { signup, signin, getCurrentUser, signout } from "../lib/api";
+import Loading from "./Loading";
+import SignInUpDialog from "./SignInUpDialog";
 
-const AuthContext = React.createContext(null);
-export const authStatus = {
-  pending: 0,
-  authenticated: 1,
-  unautenticated: 2,
+export const AUTH_STATUS = {
+  PENDING: 0,
+  AUTHENTICATED: 1,
+  UNAUTHENTICATED: 2,
 };
 
-export default function AuthProvider({ children }) {
-  const [status, setStatus] = React.useState(authStatus.pending);
-
-  const doSignUp = React.useCallback((username, password) => {
-    setStatus(authStatus.pending);
-    return signup(username, password).then((ok) => {
-      setStatus(authStatus.pending);
-      if (ok) {
-        setStatus(authStatus.authenticated);
-      } else {
-        setStatus(authStatus.unautenticated);
-      }
-      return ok;
-    });
-  }, []);
-
-  const doSignIn = React.useCallback((username, password) => {
-    setStatus(authStatus.pending);
-    return signin(username, password).then((ok) => {
-      setStatus(authStatus.pending);
-      if (ok) {
-        setStatus(authStatus.authenticated);
-      } else {
-        setStatus(authStatus.unautenticated);
-      }
-      return ok;
-    });
-  }, []);
-
-  const doSignOut = React.useCallback(() => {
-    setStatus(authStatus.pending);
-    return signout().then(() => {
-      setStatus(authStatus.unautenticated);
-    });
-  }, []);
-
-  React.useEffect(() => {
-    setStatus(authStatus.pending);
-    getCurrentUser().then((user) => {
-      setStatus(authStatus.pending);
-      if (user) {
-        setStatus(authStatus.authenticated);
-      } else {
-        setStatus(authStatus.unautenticated);
-      }
-    });
-  }, []);
-
-  const value = React.useMemo(
-    () => ({
-      status,
-      doSignUp,
-      doSignIn,
-      doSignOut,
-    }),
-    [status, doSignUp, doSignIn, doSignOut]
-  );
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
+const AuthContext = React.createContext(null);
 export function useAuth() {
   return React.useContext(AuthContext);
 }
 
 export function RequireAuth({ children }) {
   const { status } = useAuth();
-  const location = useLocation();
+  return (
+    <>
+      {status === AUTH_STATUS.PENDING && <Loading />}
+      {status === AUTH_STATUS.UNAUTHENTICATED && <SignInUpDialog />}
+      {children}
+    </>
+  );
+}
 
-  if (status === authStatus.authenticated) {
-    return children;
-  }
+export default function AuthProvider({ children }) {
+  const [status, setStatus] = React.useState(AUTH_STATUS.PENDING);
+  const [user, setUser] = React.useState("");
 
-  return <Navigate to="/signin" state={{ from: location }} replace />;
+  const doSignUp = React.useCallback((username, password) => {
+    setStatus(AUTH_STATUS.PENDING);
+    return signup(username, password).then((ok) => {
+      setStatus(AUTH_STATUS.PENDING);
+      if (ok) {
+        setStatus(AUTH_STATUS.AUTHENTICATED);
+      } else {
+        setStatus(AUTH_STATUS.UNAUTHENTICATED);
+      }
+      return ok;
+    });
+  }, []);
+
+  const doSignIn = React.useCallback((username, password) => {
+    setStatus(AUTH_STATUS.PENDING);
+    return signin(username, password).then((ok) => {
+      setStatus(AUTH_STATUS.PENDING);
+      if (ok) {
+        setStatus(AUTH_STATUS.AUTHENTICATED);
+      } else {
+        setStatus(AUTH_STATUS.UNAUTHENTICATED);
+      }
+      return ok;
+    });
+  }, []);
+
+  const doSignOut = React.useCallback(() => {
+    setStatus(AUTH_STATUS.PENDING);
+    return signout().then(() => {
+      setStatus(AUTH_STATUS.UNAUTHENTICATED);
+    });
+  }, []);
+
+  React.useEffect(() => {
+    getCurrentUser().then((user) => {
+      setStatus(AUTH_STATUS.PENDING);
+      if (user) {
+        setUser(user);
+        setStatus(AUTH_STATUS.AUTHENTICATED);
+      } else {
+        setStatus(AUTH_STATUS.UNAUTHENTICATED);
+      }
+    });
+  });
+
+  const value = React.useMemo(
+    () => ({
+      status,
+      user,
+      doSignUp,
+      doSignIn,
+      doSignOut,
+    }),
+    [status, user, doSignUp, doSignIn, doSignOut]
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

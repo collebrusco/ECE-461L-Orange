@@ -12,6 +12,13 @@ const theme = createTheme({
       textTransform: "none",
     },
   },
+  palette: {
+    neutral: {
+      main: "#f3f3f3",
+      dark: "#ccc",
+      contrastText: "#2d2e30",
+    },
+  },
 });
 
 function App() {
@@ -21,11 +28,10 @@ function App() {
         action={(key) => <SnackbarCloseButton key={key} />}
         dense
         preventDuplicate
-      >
-        <AuthProvider>
-          <Router />
-        </AuthProvider>
-      </SnackbarProvider>
+      />
+      <AuthProvider>
+        <Router />
+      </AuthProvider>
     </ThemeProvider>
   );
 }
