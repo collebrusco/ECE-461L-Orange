@@ -15,7 +15,7 @@ function SignInUpDialog() {
 
   React.useEffect(() => {
     setOpenSignIn(true);
-    enqueueSnackbar("Please sign in first", { variant: "error" });
+    enqueueSnackbar("Please sign in first", { variant: "info" });
   }, []);
 
   return (

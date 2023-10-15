@@ -65,8 +65,8 @@ export default function AuthProvider({ children }) {
   React.useEffect(() => {
     getCurrentUser().then((user) => {
       setStatus(AUTH_STATUS.PENDING);
+      setUser(user);
       if (user) {
-        setUser(user);
         setStatus(AUTH_STATUS.AUTHENTICATED);
       } else {
         setStatus(AUTH_STATUS.UNAUTHENTICATED);
