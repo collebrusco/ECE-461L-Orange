@@ -8,4 +8,8 @@ RUN npm install
 RUN npm run build
 
 # Remove everything but build/
-RUN rm -rf README.md package*.json .gitignore src public node_modules
+# RUN rm -rf README.md package*.json .gitignore src public node_modules
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]

@@ -7,10 +7,11 @@ services:
     ports:
       - 8888:80
     environment:
+      MONGODB_PORT: 27017
       MONGO_HOST_URL: mongodb://database
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: adminpassword
-      MONGO_INITDB_DATABASE: mydatabase
+      MONGO_INITDB_DATABASE: admin
     depends_on:
       - database
 
@@ -29,7 +30,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: adminpassword
-      MONGO_INITDB_DATABASE: mydatabase
+      MONGO_INITDB_DATABASE: admin
 
 volumes:
   db_store: 
