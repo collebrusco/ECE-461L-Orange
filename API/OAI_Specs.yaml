@@ -12,38 +12,25 @@ servers:
   - url: our_server_here.com
 tags:
   - name: Projects
-  - name: User
+  - name: Users
     description: Operations about Users
   - name: Resources
     description: Operations about resources
 paths:
-  /user/{userId}:
+  /users/profile:
     get:
       tags:
         - User
-      summary: Find user by ID
+      summary: Find user by JWT
       description: Returns a single user
       operationId: getUserById
-      parameters:
-        - name: userId
-          in: path
-          description: ID of user to return
-          required: true
-          schema:
-            type: integer
-            format: int64
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
                 $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid ID supplied
         '404':
           description: User not found
         '401':
@@ -52,28 +39,14 @@ paths:
         - JWTAuth: []
     put:
       tags:
-        - User
+        - Users
       summary: Update 
-      description: Update an user by Id
+      description: Update an user by JWT Token
       operationId: updateUser
-      parameters:
-        - name: userId
-          in: path
-          description: ID of user to return
-          required: true
-          schema:
-            type: integer
-            format: int64
       requestBody:
         description: Update an existent User
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/User'
         required: true
@@ -84,23 +57,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid ID supplied
         '404':
           description: User not found
-        '405':
-          description: Validation exception
         '401':
           description: Unauthorized. JWT Token is missing or invalid
       security:
         - JWTAuth: []
-  /user:  
+  /users:  
     get:
       tags:
-        - User
+        - Users
       summary: Return list of all Users
       description: Returns all users
       operationId: getUsers
@@ -119,7 +85,7 @@ paths:
         - JWTAuth: []
     post:
       tags:
-        - User
+        - Users
       summary: Add a new user
       description: Add a user
       operationId: addUser
@@ -127,12 +93,6 @@ paths:
         description: Create a new user
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/User'
         required: true
@@ -143,11 +103,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
-        '405':
+        '400':
           description: Invalid input
+        '401':
+          description: Unauthorized. JWT Token is missing or invalid
+  /users/login:
+    get:
+      tags:
+        - Users
+      summary: Returns true if login correct with JWT corresponding
+      description: Logs user in
+      operationId: login
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'          
+        '401':
+          description: Unauthorized. JWT Token is missing or invalid
+      security:
+        - JWTAuth: []
+  /users/logout:
+    get:
+      tags:
+        - Users
+      summary: Returns true if logout correct with JWT corresponding
+      description: Logs user out
+      operationId: logout
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'          
         '401':
           description: Unauthorized. JWT Token is missing or invalid
       security:
@@ -168,7 +163,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Project'
+                  $ref: '#/components/schemas/Projects'
         '401':
           description: Unauthorized. JWT token is missing or invalid.
   /resource/{userId}:
@@ -225,7 +220,7 @@ components:
           type: string
           format: date-time
           example: "2017-07-21T17:32:28Z" # https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
-    Project:
+    Projects:
       required:
         - id
         - title
@@ -273,17 +268,12 @@ components:
         project_ids:
           type: array
           items:
-            $ref: '#/components/schemas/Project'
-      xml:
-        name: User
+            $ref: '#/components/schemas/Projects'
   requestBodies:
     User:
-      description: Pet object that needs to be added to the store
+      description: User object
       content:
         application/json:
-          schema:
-            $ref: '#/components/schemas/User'
-        application/xml:
           schema:
             $ref: '#/components/schemas/User'
     UserArray:
