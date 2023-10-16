@@ -4,15 +4,17 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import datetime
 from bson import ObjectId, json_util
+import os
+from . import app
 
 
 # MongoDB connection setup using environment variables
 client = MongoClient(
     host=os.getenv("MONGO_HOST_URL", "localhost"),
     port=int(os.getenv("MONGODB_PORT", 27017)),
-    username=os.getenv("MONGODB_USERNAME", "myuser"),
-    password=os.getenv("MONGODB_PASSWORD", "mypassword"),
-    authSource=os.getenv("MONGODB_AUTH_SOURCE", "mydatabase")
+    username=os.getenv("MONGO_INITDB_ROOT_USERNAME", "myuser"),
+    password=os.getenv("MONGO_INITDB_ROOT_PASSWORD", "mypassword"),
+    authSource=os.getenv("MONGO_INITDB_DATABASE", "mydatabase")
 )
 
 try:
