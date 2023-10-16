@@ -17,6 +17,8 @@ client = MongoClient(
     authSource=os.getenv("MONGO_INITDB_DATABASE", "mydatabase")
 )
 
+# client = MongoClient()
+
 try:
     # The ismaster command is cheap and does not require auth.
     client.admin.command('ismaster')
