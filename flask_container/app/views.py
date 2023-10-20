@@ -4,14 +4,15 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import datetime
 from bson import ObjectId, json_util
-
+from app import app
+print('hello')
 def parse_json(data):
     return json.loads(json_util.dumps(data))
 
 uri = "mongodb+srv://mimiliao2000:BJygvTTeLo7yALnK@cluster0.n7lh6cn.mongodb.net/?retryWrites=true&w=majority"
-
+# uri = "mongodb://mongodb:27017/"
 # Create a new client and connect to the server
-client = MongoClient(uri, server_api=ServerApi('1'))
+client = MongoClient(uri)
 
 # Send a ping to confirm a successful connection
 try:
@@ -26,7 +27,7 @@ resources_collection = db["resources"]
 projects_collection = db["projects"]
 
 
-app = Flask(__name__)
+# app = Flask(__name__)
 jwt = JWTManager(app)
 app.config['JWT_SECRET_KEY'] = 'Your_Secret_Key'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=1)
