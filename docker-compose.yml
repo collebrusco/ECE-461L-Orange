@@ -1,0 +1,35 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "5001:5000"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_HOST: mongodb  # MongoDB service name in the default Docker network
+      MONGO_PORT: 27017
+      MONGO_USERNAME: root  # MongoDB initial root username
+      MONGO_PASSWORD: examplepassword  # MongoDB initial root password
+      MONGO_AUTHDB: admin  # Authentication database (default is "admin")
+      MONGO_DB: admindb    # MongoDB database name
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root  # MongoDB initial root username
+      MONGO_INITDB_ROOT_PASSWORD: examplepassword  # MongoDB initial root password
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
