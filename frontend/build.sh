@@ -1,8 +1,5 @@
 # Build docker image
 docker build -t orange:frontend --network=host .
 
-# Build static files using frontend container
-docker run --name frontend orange:frontend
-
-# Copy static files to backend directory
-docker cp frontend:/frontend/build ../backend
+# Deploy using frontend container
+docker run -d -p 3000:3000 --name frontend orange:frontend
