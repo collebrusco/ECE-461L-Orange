@@ -108,7 +108,7 @@ paths:
         '401':
           description: Unauthorized. JWT Token is missing or invalid
   /users/login:
-    get:
+    post:
       tags:
         - Users
       summary: Returns true if login correct with JWT corresponding
@@ -128,7 +128,7 @@ paths:
       security:
         - JWTAuth: []
   /users/logout:
-    get:
+    post:
       tags:
         - Users
       summary: Returns true if logout correct with JWT corresponding
@@ -166,6 +166,99 @@ paths:
                   $ref: '#/components/schemas/Projects'
         '401':
           description: Unauthorized. JWT token is missing or invalid.
+  /resources:
+    get:
+      tags:
+        - Resources
+      summary: Resource list of all users
+      description: receive a list of resources.
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '401':
+          description: Unauthorized. JWT token is missing or invalid.
+  /resources/{resource_id}/checkin:
+    post:
+      tags:
+        - Resources
+      summary: Checks in specified amount of resource
+      parameters:
+        - name: resource_id
+          in: path
+          description: ID of resource to checkin
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: amount
+          in: query
+          description: amount of resources to checkin
+          required: true
+          schema:
+            type: integer
+      description: check specified amount of resources in
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '400':
+          description: Invalid request, tried to check in too many or illegal value
+        '401':
+          description: Unauthorized. JWT token is missing or invalid.
+        '404': 
+          description: Resource not found
+  /resources/{resource_id}/checkout:
+    post:
+      tags:
+        - Resources
+      summary: Checks out specified amount of resource
+      parameters:
+        - name: resource_id
+          in: path
+          description: ID of resource to checkout
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: amount
+          in: query
+          description: amount of resources to checkout
+          required: true
+          schema:
+            type: integer
+      description: check specified amount of resources out
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '400':
+          description: Invalid request, tried to check out too many or illegal value
+        '401':
+          description: Unauthorized. JWT token is missing or invalid.
+        '404': 
+          description: Resource not found
   /resource/{userId}:
     get:
       tags:
@@ -276,16 +369,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/User'
-    UserArray:
-      description: List of user object
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/User'
   securitySchemes:
     JWTAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+      type: apiKey
+      in: cookie
+      name: JWT
