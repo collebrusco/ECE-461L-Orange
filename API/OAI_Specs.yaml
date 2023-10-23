@@ -11,148 +11,42 @@ externalDocs:
 servers:
   - url: our_server_here.com
 tags:
-  - name: Front End
-    description: This is where the API will send data to for the user to see
-  - name: User Management
-    description: Goes through encryption first then User Management
-  - name: Resource Management
+  - name: Projects
+  - name: Users
+    description: Operations about Users
+  - name: Resources
     description: Operations about resources
 paths:
-  /Front_End/User_Info/{user_id}:
-    put:
-      tags:
-        - Front End
-      summary: Update 
-      description: Update an user by Id
-      operationId: updateUser
-      parameters:
-        - name: user_id
-          in: path
-          description: ID of user to return
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        description: Update an existent User
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: User not found
-        '405':
-          description: Validation exception
-      security:
-        - petstore_auth:
-            - write:users
-            - read:users
-  /Front_End/User_Info:  
-    post:
-      tags:
-        - Front End
-      summary: Add a new user
-      description: Add a user
-      operationId: addUser
-      requestBody:
-        description: Create a new user
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
-        '405':
-          description: Invalid input
-      security:
-        - petstore_auth:
-            - write:users
-            - read:users
-  /User/{userId}:
+  /users/profile:
     get:
       tags:
-        - User Management
-      summary: Find user by ID
+        - User
+      summary: Find user by JWT
       description: Returns a single user
       operationId: getUserById
-      parameters:
-        - name: userId
-          in: path
-          description: ID of user to return
-          required: true
-          schema:
-            type: integer
-            format: int64
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
                 $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid ID supplied
         '404':
           description: User not found
+        '401':
+          description: Unauthorized. JWT Token is missing or invalid
       security:
-        - api_key: []
-        - petstore_auth:
-            - write:users
-            - read:users
-  /User: 
+        - JWTAuth: []
     put:
       tags:
-        - User Management
+        - Users
       summary: Update 
-      description: Update an user by Id
+      description: Update an user by JWT Token
       operationId: updateUser
       requestBody:
         description: Update an existent User
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/User'
         required: true
@@ -163,22 +57,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid ID supplied
         '404':
           description: User not found
-        '405':
-          description: Validation exception
+        '401':
+          description: Unauthorized. JWT Token is missing or invalid
       security:
-        - petstore_auth:
-            - write:users
-            - read:users
+        - JWTAuth: []
+  /users:  
     post:
       tags:
-        - User Management
+        - Users
       summary: Add a new user
       description: Add a user
       operationId: addUser
@@ -188,12 +76,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
         required: true
       responses:
         '200':
@@ -202,17 +84,215 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
-        '405':
+        '400':
           description: Invalid input
+        '401':
+          description: Unauthorized. JWT Token is missing or invalid
+  /users/login:
+    post:
+      tags:
+        - Users
+      summary: Returns true if login correct with JWT corresponding
+      description: Logs user in
+      operationId: login
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'          
+        '401':
+          description: Unauthorized. JWT Token is missing or invalid
       security:
-        - petstore_auth:
-            - write:users
-            - read:users
+        - JWTAuth: []
+  /users/logout:
+    post:
+      tags:
+        - Users
+      summary: Returns true if logout correct with JWT corresponding
+      description: Logs user out
+      operationId: logout
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'          
+        '401':
+          description: Unauthorized. JWT Token is missing or invalid
+      security:
+        - JWTAuth: []
+  /projects:
+    get:
+      tags:
+        - Projects
+      summary: Project list
+      description: receive a list of projects of the user.
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Projects'
+        '401':
+          description: Unauthorized. JWT token is missing or invalid.
+  /resources:
+    get:
+      tags:
+        - Resources
+      summary: Resource list of all users
+      description: receive a list of resources.
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '401':
+          description: Unauthorized. JWT token is missing or invalid.
+  /resources/{resource_id}/checkin:
+    post:
+      tags:
+        - Resources
+      summary: Checks in specified amount of resource
+      parameters:
+        - name: resource_id
+          in: path
+          description: ID of resource to checkin
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: amount
+          in: query
+          description: amount of resources to checkin
+          required: true
+          schema:
+            type: integer
+      description: check specified amount of resources in
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '400':
+          description: Invalid request, tried to check in too many or illegal value
+        '401':
+          description: Unauthorized. JWT token is missing or invalid.
+        '404': 
+          description: Resource not found
+  /resources/{resource_id}/checkout:
+    post:
+      tags:
+        - Resources
+      summary: Checks out specified amount of resource
+      parameters:
+        - name: resource_id
+          in: path
+          description: ID of resource to checkout
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: amount
+          in: query
+          description: amount of resources to checkout
+          required: true
+          schema:
+            type: integer
+      description: check specified amount of resources out
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
+        '400':
+          description: Invalid request, tried to check out too many or illegal value
+        '401':
+          description: Unauthorized. JWT token is missing or invalid.
+        '404': 
+          description: Resource not found
 components:
   schemas:
+    Resource:
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        capacity:
+          type: integer
+          example: 100
+        availability:
+          type: integer
+          example: 30
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+            - type1
+            - type2
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z" # https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
+    Projects:
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        title:
+          type: string
+          example: Project 1
+        description:
+          type: string
+        user_ids:
+          type: array
+          example: [1, 2, 3]
+        creator:
+          type: integer
+          description: User id of Creator
+          format: int64
+          example: 10
+        resources:
+          type: array
+          description: array of resource ids
+          example: [1, 3, 8]
     User:
       required:
         - name
@@ -223,51 +303,28 @@ components:
           type: integer
           format: int64
           example: 10
-        name:
+        username:
           type: string
-          example: John Cena
-      xml:
-        name: User
-    ApiResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-        type:
+          example: spenc
+        password:
           type: string
-        message:
+        created_at:
           type: string
-      xml:
-        name: '##default'
+          format: date-time
+          example: "2017-07-21T17:32:28Z" # https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
+        project_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Projects'
   requestBodies:
     User:
-      description: Pet object that needs to be added to the store
+      description: User object
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/User'
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/User'
-    UserArray:
-      description: List of user object
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/User'
   securitySchemes:
-    petstore_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: https://idk_man.com
-          scopes:
-            write:users: modify users in your account
-            read:users: read your users
-    api_key:
+    JWTAuth:
       type: apiKey
-      name: api_key
-      in: header
+      in: cookie
+      name: JWT
