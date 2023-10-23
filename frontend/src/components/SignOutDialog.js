@@ -1,5 +1,4 @@
-import { useNavigate } from "react-router-dom";
-import { useSnackbar } from "notistack";
+import { enqueueSnackbar } from "notistack";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -10,8 +9,7 @@ import { useAuth } from "./AuthProvider";
 
 function SignOutDialog(props) {
   const { open, onClose } = props;
-  const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
+  // const refresh = () => setTimeout(document.location.reload, 1000);
   const { doSignOut } = useAuth();
   return (
     <Dialog open={open} onClose={onClose}>
@@ -30,7 +28,7 @@ function SignOutDialog(props) {
               enqueueSnackbar("Signed out successfully.", {
                 variant: "success",
               });
-              setTimeout(() => navigate(0), 1000);
+              // refresh();
             })
           }
           autoFocus
