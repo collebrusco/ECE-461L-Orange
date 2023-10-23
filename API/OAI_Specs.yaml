@@ -64,25 +64,6 @@ paths:
       security:
         - JWTAuth: []
   /users:  
-    get:
-      tags:
-        - Users
-      summary: Return list of all Users
-      description: Returns all users
-      operationId: getUsers
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'          
-        '401':
-          description: Unauthorized. JWT Token is missing or invalid
-      security:
-        - JWTAuth: []
     post:
       tags:
         - Users
@@ -259,33 +240,6 @@ paths:
           description: Unauthorized. JWT token is missing or invalid.
         '404': 
           description: Resource not found
-  /resource/{userId}:
-    get:
-      tags:
-        - Resources
-      summary: Resource list of specified user
-      parameters:
-        - name: userId
-          in: path
-          description: ID of user to return their resources
-          required: true
-          schema:
-            type: integer
-            format: int64
-      description: receive a list of resources of the user.
-      security:
-        - JWTAuth: []
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Resource'
-        '401':
-          description: Unauthorized. JWT token is missing or invalid.
 components:
   schemas:
     Resource:
