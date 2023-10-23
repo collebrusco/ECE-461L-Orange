@@ -24,7 +24,7 @@ export async function signin(username, password) {
 }
 
 export async function getCurrentUser() {
-  return localStorage.getItem('currentUser');
+  return localStorage.getItem('currentUser') || "";
 }
 
 export async function signout() {
