@@ -1,3 +1,5 @@
 Flask
 requests
 flask_cors
+pymongo
+flask_jwt_extended
