@@ -9,9 +9,14 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+tags:
+  - name: Projects
+    description: APIs related to projects
 paths:
-  /projects/:
+  /projects:
     get:
+      tags:
+        - Projects
       summary: Poject list
       description: receive a list of projects of the user.
       security:
@@ -22,19 +27,225 @@ paths:
           content:
             application/json:
               example:
-               -  id: 2
-                  title: "Project 1"
-                  description: "This is for project 1"
-                  users: ["Mimi", "Frank", "Ayan"]
-                  creator: "Mimi"
-                  resources list: [1, 3, 8]
-               -  id: 8
-                  title: "Project 2"
-                  description: "This is for project 2"
-                  users: ["Mimi", "Frank", "Ayan"]
-                  creator: "Frank"
-                  resources list: [2, 3, 8]
-               
-                
+                - id: 2
+                  title: Project 1
+                  description: This is for project 1
+                  users:
+                    - Mimi
+                    - Frank
+                    - Ayan
+                  creator: Mimi
+                  resources list:
+                    - "Type A": 3
+                    - "Type B": 2
+                    - "Type C": 5
+                - id: 8
+                  title: Project 2
+                  description: This is for project 2
+                  users:
+                    - Mimi
+                    - Frank
+                    - Ayan
+                  creator: Frank
+                  resources list:
+                    - "1": 3
+                    - "4": 4
+                    - "9": 5
         '401':
           description: Unauthorized. JWT token is missing or invalid.
+    post:
+      summary: Create a new project for a user
+      security:
+        - JWTAuth: []
+      tags: 
+        - Projects
+      requestBody:
+        description: Project data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                # id:
+                #   type: integer
+                #   description: Unique identifier for the project (primary key)
+                title:
+                  type: string
+                  description: Project title
+                description:
+                  type: string
+                  description: Project description
+                user_ids:
+                  type: array
+                  items:
+                    type: string
+                    example: 
+                    - "3042"
+                    - "3944"
+                  description: List of user IDs associated with the project
+                creator_id:
+                  type: string
+                  description: ID of the user who created the project
+                  example: "3920"
+                resources:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      resource_id:
+                        type: string
+                        description: ID of the resource
+                      quantity:
+                        type: integer
+                        description: Quantity of the resource required
+                  example:
+                  - resource_id: "3"
+                    quantity: 3
+                  - resource_id: "9"
+                    quantity: 5
+                      
+                    
+                  description: List of resources required for the project
+      responses:
+        '201':
+          description: Project created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  projectId:
+                    type: integer
+                    description: ID of the created project
+        '400':
+          description: Bad request. Invalid input data.
+        '404':
+          description: User not found.
+        '500':
+          description: Internal server error. Failed to create the project.
+  /projects/{projectId}/users:
+    post:
+      summary: "Add a new user to the project"
+      description: "Add a new user to the specified project."
+      tags:
+        - Projects
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: "projectId"
+          in: "path"
+          description: "ID of the project to which the user will be added"
+          required: true
+          schema:
+            type: "string"
+          example: "651a62a3b5248dbcc86fbef1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                userId:
+                  type: "string"
+                  description: "ID of the user to be added to the project"
+                  example: "65235a9bdf748fa11b4724cd"
+              required:
+                - userId
+      responses:
+        '201':
+          description: "User added to the project successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    example: "User added to the project successfully"
+        '400':
+          description: "Bad Request: Invalid input data"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    example: "Invalid user ID format"
+        '404':
+          description: "Not Found: Project not found"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    example: "Project not found"
+        '500':
+          description: "Internal Server Error: Failed to add user to the project"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    example: "Failed to add user to the project"
+    delete:
+      summary: "Remove a user from the project"
+      description: "Remove an existing user from the specified project."
+      tags:
+        - Projects
+      security:
+        - JWTAuth: []
+      parameters:
+        - name: "projectId"
+          in: "path"
+          description: "ID of the project from which the user will be removed"
+          required: true
+          schema:
+            type: "string"
+          example: "651a62a3b5248dbcc86fbef1"
+        - name: "userId"
+          in: "query"
+          description: "ID of the user to be removed from the project"
+          required: true
+          schema:
+            type: "string"
+          example: "65235a9bdf748fa11b4724cd"
+      responses:
+        '204':
+          description: "User removed from the project successfully"
+        '400':
+          description: "Bad Request: Invalid input data"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    example: "Invalid user ID format"
+        '404':
+          description: "Not Found: Project or user not found"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    example: "Project or user not found"
+        '500':
+          description: "Internal Server Error: Failed to remove user from the project"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    example: "Failed to remove user from the project"
