@@ -65,7 +65,6 @@ export default function HardwareInfo(props) {
         onChange={onQuantityChange}
       />
       <Button
-        // color="info"
         variant="contained"
         disabled={props.disabled}
         onClick={handleCheckOut}

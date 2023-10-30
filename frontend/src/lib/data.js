@@ -1,59 +1,46 @@
-export const projectNames = [
-  "Project 1",
-  "Project 2",
-  "Project 3",
+export const PROJECTS = [
+  {
+    "id": 2,
+    "title": "Project 1",
+    "description": "This is for project 1",
+    "users": [
+      "Mimi",
+      "Frank",
+      "Ayan"
+    ],
+    "creator": "Mimi",
+    "resources list": [
+      {
+        "Type A": 100
+      },
+      {
+        "Type B": 100
+      },
+      {
+        "Type C": 100
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Project 2",
+    "description": "This is for project 2",
+    "users": [
+      "Mimi",
+      "Frank",
+      "Ayan"
+    ],
+    "creator": "Frank",
+    "resources list": [
+      {
+        "Type A": 100
+      },
+      {
+        "Type B": 100
+      },
+      {
+        "Type C": 100
+      }
+    ]
+  }
 ];
-
-export const roles = [
-  "Owner",
-  "Member",
-  "Member"
-];
-
-export const projectsInfo = {
-  "Project 1": {
-    members: ["John", "Mary", "Michael"],
-    hardwares: [
-      {
-        name: "HWSet1",
-        availability: 100,
-        capacity: 100,
-      },
-      {
-        name: "HWSet2",
-        availability: 100,
-        capacity: 100,
-      },
-    ],
-  },
-  "Project 2": {
-    members: ["Jennifer", "David", "Linda"],
-    hardwares: [
-      {
-        name: "HWSet1",
-        availability: 100,
-        capacity: 100,
-      },
-      {
-        name: "HWSet2",
-        availability: 100,
-        capacity: 100,
-      },
-    ],
-  },
-  "Project 3": {
-    members: ["Robert", "Patricia", "William"],
-    hardwares: [
-      {
-        name: "HWSet1",
-        availability: 100,
-        capacity: 100,
-      },
-      {
-        name: "HWSet2",
-        availability: 100,
-        capacity: 100,
-      },
-    ],
-  },
-};

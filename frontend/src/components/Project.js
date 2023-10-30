@@ -2,15 +2,10 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import HardwareInfo from "./HardwareInfo";
-import { projectsInfo } from "../lib/data";
-import { useAuth } from "./AuthProvider";
 
 export default function Project(props) {
-  const { name } = props;
-  const projectInfo = projectsInfo[name];
-  const { user } = useAuth();
+  const { name, description, members, hardwares } = props;
 
-  const members = [...projectInfo.members, user];
   return (
     <Box
       display="flex"
@@ -20,17 +15,22 @@ export default function Project(props) {
         <Typography component="h2" variant="h6">
           {name}
         </Typography>
-        <Typography>{members.join(", ")}</Typography>
+        <Typography>Members: {members.join(", ")}</Typography>
+        <Typography>Description: {description}</Typography>
       </Box>
       <Box>
         <Box>
-          {projectInfo.hardwares.map((hardware) => (
-            <HardwareInfo
-              name={hardware.name}
-              availability={hardware.availability}
-              capacity={hardware.capacity}
-            />
-          ))}
+          {hardwares.map((hardware) => {
+            const name = Object.keys(hardware)[0];
+            const availability = hardware[name];
+            return (
+              <HardwareInfo
+                name={name}
+                availability={availability}
+                capacity={100}
+              />
+            );
+          })}
         </Box>
       </Box>
     </Box>

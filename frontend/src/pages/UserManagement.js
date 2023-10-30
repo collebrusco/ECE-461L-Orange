@@ -9,26 +9,32 @@ import IconButton from "@mui/material/IconButton";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { useAuth } from "../components/AuthProvider";
 import CreateProject from "../components/CreateProject";
+import JoinProject from "../components/JoinProject";
+import { getUserProjects } from "../lib/api";
 import Layout from "./Layout";
-import { projectNames, roles } from "../lib/data";
 
 function ProjectInfo(props) {
-  const { name, role } = props;
+  const { name, isCreator } = props;
   return (
     <Grid container>
       <Grid item xs={6}>
         <Typography>{name}</Typography>
       </Grid>
       <Grid item xs={6}>
-        <Typography>{role}</Typography>
+        <Typography>{isCreator ? "Owner" : "Member"}</Typography>
       </Grid>
     </Grid>
   );
 }
 
-function Content(props) {
+function Content() {
   const { user } = useAuth();
-  const joinedDate = format(new Date("2017-07-21T17:32:28Z"), "MMMM d, yyyy");
+  const joinedDate = format(new Date(), "MMMM d, yyyy");
+  const [projects, setProjects] = React.useState([]);
+
+  React.useEffect(() => {
+    getUserProjects().then(setProjects);
+  }, []);
 
   return (
     <Box width="80%" m="auto" display="flex" flexDirection="column">
@@ -51,13 +57,14 @@ function Content(props) {
       <Box mt={2}>
         <Typography fontWeight="bold">Project list</Typography>
         <Box mt={1}>
-          {projectNames.map((name, index) => (
-            <ProjectInfo name={name} role={roles[index]} />
+          {projects.map(({title, creator}) => (
+            <ProjectInfo name={title} isCreator={user === creator} />
           ))}
         </Box>
       </Box>
-      <Box mt={2}>
+      <Box mt={2} display="flex" justifyContent="space-between">
         <CreateProject />
+        <JoinProject />
       </Box>
     </Box>
   );
@@ -81,13 +88,13 @@ function UserManagement() {
     >
       <Paper
         sx={{
-          maxWidth: "30%",
+          maxWidth: "50%",
           m: "auto",
           mt: 4,
           p: 4,
         }}
       >
-        <Content username="placeholder" />
+        <Content />
       </Paper>
     </Layout>
   );

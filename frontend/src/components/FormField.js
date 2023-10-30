@@ -14,6 +14,7 @@ function FormField(props) {
     errorMessage,
     handleChange,
     handleBlur,
+    multiline
   } = props;
   return (
     <Grid item xs={12}>
@@ -28,6 +29,8 @@ function FormField(props) {
         onChange={handleChange}
         onBlur={handleBlur}
         error={hasError}
+        multiline={multiline}
+        rows={4}
       />
       <FormHelperText error={hasError}>
         {hasError && errorMessage}

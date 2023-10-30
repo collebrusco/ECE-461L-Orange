@@ -5,13 +5,12 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import DialogLayout from "./DialogLayout";
-import FormField from "./FormField";
+import FormField from "../FormField";
 import { useAuth } from "../AuthProvider.js";
 
 function Form(props) {
   const { onClose } = props;
   const { doSignIn } = useAuth();
-  // const refresh = () => setTimeout(document.location.reload, 1000);
   return (
     <Formik
       initialValues={{ username: "", password: "" }}
@@ -28,20 +27,17 @@ function Form(props) {
       onSubmit={(values, { setSubmitting }) => {
         doSignIn(values.username, values.password).then((ok) => {
           if (ok) {
-            // alert(
-            //   `Username: ${values.username}\nPassword: ${values.password}\n`
-            // );
             onClose();
             enqueueSnackbar("Signed up successfully.", {
               variant: "success",
             });
-            // refresh();
           } else {
             enqueueSnackbar("Incorrect username or password", {
               variant: "error",
             });
           }
           setSubmitting(false);
+          setTimeout(() => document.location.reload(), 1000);
         });
       }}
     >
@@ -72,7 +68,7 @@ function Form(props) {
             id="username"
             label="Username"
             name="username"
-            type="username"
+            type="text"
             autoComplete="username"
             hasError={touched.username && !!errors.username}
             errorMessage={errors.username}

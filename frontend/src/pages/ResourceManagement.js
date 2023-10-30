@@ -6,13 +6,24 @@ import IconButton from '@mui/material/IconButton';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import Layout from "./Layout";
 import Project from "../components/Project";
-import { projectNames } from "../lib/data";
+import { getUserProjects } from "../lib/api";
 
 function Content() {
+  const [projects, setProjects] = React.useState([]);
+
+  React.useEffect(() => {
+    getUserProjects().then(setProjects);
+  }, []);
+
   return (
     <Box display="flex" flexDirection="column" gap={2} mt={2} mb={2} >
-      {projectNames.map(name => (
-        <Project name={name} />
+      {projects.map(project => (
+        <Project
+          name={project.title}
+          description={project.description}
+          members={project.users}
+          hardwares={project["resources list"]}
+        />
       ))}
     </Box>
   );
