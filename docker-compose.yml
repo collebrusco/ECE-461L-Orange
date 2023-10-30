@@ -33,6 +33,13 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: backend frontend
+
 volumes:
   mongodb_data:
 
