@@ -1,84 +1,34 @@
 import React from "react";
-import { enqueueSnackbar } from "notistack";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import CircularProgress from "./CirularProgress";
 
 export default function HardwareInfo(props) {
-  const [availability, setAvailability] = React.useState(props.availability);
-  const [quantity, setQuantity] = React.useState(null);
-
-  React.useEffect(() => {
-    if (props.disabled) {
-      setQuantity(null);
-    }
-  }, [setQuantity, props.disabled]);
-
-  const handleCheckOut = () => {
-    if (quantity == null || quantity <= 0) {
-      return;
-    }
-    if (quantity > availability) {
-      enqueueSnackbar("Too many to check out.", { variant: "error" });
-      return;
-    }
-    setAvailability(availability - quantity);
-  };
-
-  const handleCheckIn = () => {
-    if (quantity == null || quantity <= 0) {
-      return;
-    }
-    if (quantity > props.capacity - availability) {
-      enqueueSnackbar("Too many to check in.", { variant: "error" });
-      return;
-    }
-    setAvailability(availability + quantity);
-  };
-
-  const onQuantityChange = (e) => {
-    if (e.target.value === "") {
-      setQuantity(null);
-      return;
-    }
-    const value = Number(e.target.value);
-    if (isNaN(value)) {
-      return;
-    }
-    setQuantity(value);
-  };
-
+  const { name, capacity, availability } = props;
   return (
-    <Box display="flex" flexDirection="row" gap={1} alignItems="center">
-      <Box flexGrow={1}>
-        <Typography>
-          {props.name}: {availability}/{props.capacity}
-        </Typography>
+    <Box display="flex" flexDirection="column" gap={1}>
+      <Typography component="h3" variant="h6" textAlign="center">
+        {name}
+      </Typography>
+      <Box alignSelf="center">
+        <CircularProgress value={(availability * 100) / capacity} />
       </Box>
-      <TextField
-        placeholder="Enter quantity"
-        variant="standard"
-        sx={{ p: 1 }}
-        value={quantity == null ? "" : quantity}
-        disabled={props.disabled}
-        onChange={onQuantityChange}
-      />
-      <Button
-        variant="contained"
-        disabled={props.disabled}
-        onClick={handleCheckOut}
-      >
-        Check out
-      </Button>
-      <Button
-        color="neutral"
-        variant="contained"
-        disabled={props.disabled}
-        onClick={handleCheckIn}
-      >
-        Check in
-      </Button>
+      <Box width="10rem" display="flex">
+        <Box width="80%">
+          <Typography fontWeight="bold">Availability</Typography>
+        </Box>
+        <Box width="20%">
+          <Typography>{availability}</Typography>
+        </Box>
+      </Box>
+      <Box display="flex">
+        <Box width="80%">
+          <Typography fontWeight="bold">Capacity</Typography>
+        </Box>
+        <Box width="20%">
+          <Typography>{capacity}</Typography>
+        </Box>
+      </Box>
     </Box>
   );
 }

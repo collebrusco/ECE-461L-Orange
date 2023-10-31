@@ -1,46 +1,26 @@
-export const PROJECTS = [
+export const RESOURCES = [
   {
-    "id": 2,
-    "title": "Project 1",
-    "description": "This is for project 1",
-    "users": [
-      "Mimi",
-      "Frank",
-      "Ayan"
-    ],
-    "creator": "Mimi",
-    "resources list": [
-      {
-        "Type A": 100
-      },
-      {
-        "Type B": 100
-      },
-      {
-        "Type C": 100
-      }
-    ]
+    "id": 0,
+    "capacity": 100,
+    "availability": 100,
+    "title": "HW Set 1",
+    "type": "type1",
+    "created_at": "2017-07-21T17:32:28Z"
   },
   {
-    "id": 8,
-    "title": "Project 2",
-    "description": "This is for project 2",
-    "users": [
-      "Mimi",
-      "Frank",
-      "Ayan"
-    ],
-    "creator": "Frank",
-    "resources list": [
-      {
-        "Type A": 100
-      },
-      {
-        "Type B": 100
-      },
-      {
-        "Type C": 100
-      }
-    ]
-  }
+    "id": 1,
+    "capacity": 100,
+    "availability": 100,
+    "title": "HW Set 2",
+    "type": "type2",
+    "created_at": "2017-07-21T17:32:28Z"
+  },
+  {
+    "id": 2,
+    "capacity": 100,
+    "availability": 100,
+    "title": "HW Set 3",
+    "type": "type3",
+    "created_at": "2017-07-21T17:32:28Z"
+  },
 ];
