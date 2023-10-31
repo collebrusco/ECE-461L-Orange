@@ -8,14 +8,10 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import Layout from "./Layout";
 import Project from "../components/Project";
 import HardwareInfo from '../components/HardwareInfo';
-import { getResources, getUserProjects } from "../lib/api";
+import { useStore } from '../components/StoreProvider';
 
 function Resources() {
-  const [resources, setResources] = React.useState([]);
-
-  React.useEffect(() => {
-    getResources().then(setResources);
-  }, []);
+  const { resources } = useStore();
 
   return (
     <Box display="flex" justifyContent="space-around" p={2}>
@@ -33,11 +29,7 @@ function Resources() {
 }
 
 function Projects() {
-  const [projects, setProjects] = React.useState([]);
-
-  React.useEffect(() => {
-    getUserProjects().then(setProjects);
-  }, []);
+  const { projects } = useStore();
 
   return (
     <Box display="flex" flexDirection="column" gap={2} mt={2} mb={2} >

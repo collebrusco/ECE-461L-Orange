@@ -29,22 +29,27 @@ function Form(props) {
         }
         return errors;
       }}
-      onSubmit={(values, { setSubmitting }) => {
-        doSignUp(values.username, values.password).then((ok) => {
-          if (ok) {
+      onSubmit={(values, { setSubmitting, resetForm }) => {
+        doSignUp(values.username, values.password)
+          .then(() => {
             onClose();
             enqueueSnackbar("Signed up successfully.", {
               variant: "success",
             });
-          } else {
-            enqueueSnackbar("Cannot sign up.", { variant: "error" });
-          }
-          setSubmitting(false);
-          setTimeout(() => document.location.reload(), 1000);
-        });
+            resetForm();
+          })
+          .catch(() =>
+            enqueueSnackbar("Cannot sign up.", {
+              variant: "error",
+            })
+          )
+          .finally(() => {
+            setSubmitting(false);
+          });
       }}
     >
       {({
+        values,
         errors,
         touched,
         handleChange,
@@ -75,6 +80,7 @@ function Form(props) {
             autoComplete="username"
             hasError={touched.username && !!errors.username}
             errorMessage={errors.username}
+            value={values.username}
             handleChange={handleChange}
             handleBlur={handleBlur}
           />
@@ -88,6 +94,7 @@ function Form(props) {
             autoComplete="new-password"
             hasError={touched.password && !!errors.password}
             errorMessage={errors.password}
+            value={values.password}
             handleChange={handleChange}
             handleBlur={handleBlur}
           />
@@ -100,6 +107,7 @@ function Form(props) {
             type="password"
             hasError={touched.confirmPassword && !!errors.confirmPassword}
             errorMessage={errors.confirmPassword}
+            value={values.confirmPassword}
             handleChange={handleChange}
             handleBlur={handleBlur}
           />

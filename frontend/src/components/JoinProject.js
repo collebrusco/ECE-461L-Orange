@@ -5,26 +5,27 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import FormField from "./FormField";
-import { joinProject } from "../lib/api";
+import { useStore } from "./StoreProvider";
 
 function JoinProject() {
+  const { joinProject } = useStore();
   return (
     <Formik
-      initialValues={{ projectID: "" }}
+      initialValues={{ projectName: "" }}
       validate={(values) => {
         const errors = {};
-        if (!values.projectID) {
-          errors.projectID = "Required";
+        if (!values.projectName) {
+          errors.projectName = "Required";
         }
         return errors;
       }}
-      onSubmit={(values, { setSubmitting }) => {
-        joinProject(values.projectID)
+      onSubmit={(values, { setSubmitting, resetForm }) => {
+        joinProject(values.projectName)
         .then(() => {
           enqueueSnackbar("Joined successfully.", {
             variant: "success",
           });
-          setTimeout(() => document.location.reload(), 1000);
+          resetForm();
         })
         .catch(() => {
           enqueueSnackbar("Failed to join project.", {
@@ -37,6 +38,7 @@ function JoinProject() {
       }}
     >
       {({
+        values,
         errors,
         touched,
         handleChange,
@@ -59,12 +61,13 @@ function JoinProject() {
           <Typography fontWeight="bold">Join project</Typography>
           <FormField
             required
-            id="project-id"
-            name="projectID"
-            label="Project ID"
-            type="number"
-            hasError={touched.projectID && !!errors.projectID}
-            errorMessage={errors.projectID}
+            id="join-project-name"
+            name="projectName"
+            label="Project name"
+            type="text"
+            hasError={touched.projectName && !!errors.projectName}
+            errorMessage={errors.projectName}
+            value={values.projectName}
             handleChange={handleChange}
             handleBlur={handleBlur}
           />

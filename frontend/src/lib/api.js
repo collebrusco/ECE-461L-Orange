@@ -5,28 +5,37 @@ function getUsers() {
   return users ? JSON.parse(users) : {};
 }
 
+function setCurrentUser(username) {
+  const users = getUsers();
+  localStorage.setItem("currentUser", JSON.stringify({
+    ...users[username],
+    username
+  }));
+}
+
 export async function signup(username, password) {
   const users = getUsers();
   if (username in users) {
     return false;
   }
-  users[username] = password;
+  users[username] = { password, createdAt: new Date().toISOString() };
   localStorage.setItem("users", JSON.stringify(users));
-  localStorage.setItem("currentUser", username);
+  setCurrentUser(username);
   return true;
 }
 
 export async function signin(username, password) {
   const users = getUsers();
-  if (username in users && users[username] === password) {
-    localStorage.setItem("currentUser", username);
+  if (username in users && users[username].password === password) {
+    setCurrentUser(username);
     return true;
   }
   return false;
 }
 
 export async function getCurrentUser() {
-  return localStorage.getItem("currentUser") || "";
+  const currentUser = localStorage.getItem("currentUser");
+  return currentUser ? JSON.parse(currentUser) : "";
 }
 
 export async function signout() {
@@ -39,7 +48,7 @@ function getProjects() {
 }
 
 export async function getUserProjects() {
-  const username = await getCurrentUser();
+  const { username } = await getCurrentUser();
   if (!username) return [];
   const projects = getProjects();
   const userProjects = projects.filter(
@@ -48,11 +57,13 @@ export async function getUserProjects() {
   return userProjects;
 }
 
-export async function createProject(name, id, description) {
-  const username = await getCurrentUser();
+export async function createProject(name, description) {
+  const { username } = await getCurrentUser();
   const projects = getProjects();
+  if (projects.find((project) => project.title === name)) {
+    throw new Error("Project already exists");
+  }
   projects.push({
-    id: id,
     title: name,
     description: description,
     users: [username],
@@ -66,12 +77,15 @@ export async function createProject(name, id, description) {
   localStorage.setItem("projects", JSON.stringify(projects));
 }
 
-export async function joinProject(projectID) {
-  const username = await getCurrentUser();
+export async function joinProject(projectName) {
+  const { username } = await getCurrentUser();
   const projects = getProjects();
-  const project = projects.find((project) => project.id === projectID);
+  const project = projects.find((project) => project.title === projectName);
   if (!project) {
     throw new Error("Project not found");
+  }
+  if (project.users.indexOf(username) !== -1) {
+    throw new Error("Already joined");
   }
   project.users.push(username);
   localStorage.setItem("projects", JSON.stringify(projects));
@@ -84,7 +98,9 @@ export async function getResources() {
 
 export async function checkout(resource_name, quantity, project_name) {
   const resources = await getResources();
-  const resource = resources.find((resource) => resource.title === resource_name);
+  const resource = resources.find(
+    (resource) => resource.title === resource_name
+  );
 
   if (resource.availability < quantity) {
     throw new Error("Too many to check out.");
@@ -100,7 +116,9 @@ export async function checkout(resource_name, quantity, project_name) {
 
 export async function checkin(resource_name, quantity, project_name) {
   const resources = await getResources();
-  const resource = resources.find((resource) => resource.title === resource_name);
+  const resource = resources.find(
+    (resource) => resource.title === resource_name
+  );
 
   if (resource.availability + quantity > resource.capacity) {
     throw new Error("Too many to check in.");

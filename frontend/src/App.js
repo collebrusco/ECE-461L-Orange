@@ -3,6 +3,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import SnackbarCloseButton from "./components/SnackbarCloseButton";
 import AuthProvider from "./components/AuthProvider";
+import StoreProvider from "./components/StoreProvider";
 import Router from "./Router";
 
 const theme = createTheme({
@@ -30,7 +31,9 @@ function App() {
         preventDuplicate
       />
       <AuthProvider>
-        <Router />
+        <StoreProvider>
+          <Router />
+        </StoreProvider>
       </AuthProvider>
     </ThemeProvider>
   );

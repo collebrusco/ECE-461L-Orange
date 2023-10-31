@@ -4,30 +4,28 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { getResources, checkin, checkout } from "../lib/api";
+import { useStore } from "./StoreProvider";
 
 export default function HardwareUsage(props) {
   const { name, usage, projectName } = props;
   const [quantity, setQuantity] = React.useState(null);
-  const [capacity, setCapacity] = React.useState(0);
+  const [availability, setAvailability] = React.useState(0);
 
+  const { resources, checkout, checkin } = useStore();
   React.useEffect(() => {
-    getResources().then((resources) => {
-      const resource = resources.find((resource) => resource.title === name);
-      setCapacity(resource.capacity);
-    });
-  }, [name]);
+    const resource = resources.find((resource) => resource.title === name);
+    setAvailability(resource.availability);
+  }, [resources, name]);
 
   const handleCheckOut = () => {
     if (quantity == null || quantity <= 0) {
       return;
     }
-    if (quantity + usage > capacity) {
+    if (quantity > availability) {
       enqueueSnackbar("Too many to check out.", { variant: "error" });
       return;
     } else {
       checkout(name, quantity, projectName);
-      setTimeout(() => document.location.reload(), 0);
     }
   };
 
@@ -40,7 +38,6 @@ export default function HardwareUsage(props) {
       return;
     } else {
       checkin(name, quantity, projectName);
-      setTimeout(() => document.location.reload(), 0);
     }
   };
 

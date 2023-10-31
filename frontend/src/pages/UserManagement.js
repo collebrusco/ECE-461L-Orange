@@ -8,9 +8,9 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { useAuth } from "../components/AuthProvider";
+import { useStore } from "../components/StoreProvider";
 import CreateProject from "../components/CreateProject";
 import JoinProject from "../components/JoinProject";
-import { getUserProjects } from "../lib/api";
 import Layout from "./Layout";
 
 function ProjectInfo(props) {
@@ -28,13 +28,9 @@ function ProjectInfo(props) {
 }
 
 function Content() {
-  const { user } = useAuth();
-  const joinedDate = format(new Date(), "MMMM d, yyyy");
-  const [projects, setProjects] = React.useState([]);
-
-  React.useEffect(() => {
-    getUserProjects().then(setProjects);
-  }, []);
+  const { user: { createdAt, username } } = useAuth();
+  const joinedDate = createdAt && format(new Date(createdAt), "MMMM d, yyyy");
+  const { projects } = useStore();
 
   return (
     <Box width="80%" m="auto" display="flex" flexDirection="column">
@@ -43,7 +39,7 @@ function Content() {
           <Typography fontWeight="bold">Username</Typography>
         </Grid>
         <Grid item xs={6}>
-          <Typography>{user}</Typography>
+          <Typography>{username}</Typography>
         </Grid>
       </Grid>
       <Grid container>
@@ -58,7 +54,7 @@ function Content() {
         <Typography fontWeight="bold">Project list</Typography>
         <Box mt={1}>
           {projects.map(({title, creator}) => (
-            <ProjectInfo name={title} isCreator={user === creator} />
+            <ProjectInfo name={title} isCreator={username === creator} />
           ))}
         </Box>
       </Box>

@@ -5,29 +5,27 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import FormField from "./FormField";
-import { createProject } from "../lib/api";
+import { useStore } from "./StoreProvider";
 
 function CreateProject() {
+  const { createProject } = useStore();
   return (
     <Formik
-      initialValues={{ name: "", id: "", description: "" }}
+      initialValues={{ name: "", description: "" }}
       validate={(values) => {
         const errors = {};
         if (!values.name) {
           errors.name = "Required";
         }
-        if (!values.id) {
-          errors.id = "Required";
-        }
         return errors;
       }}
-      onSubmit={(values, { setSubmitting }) => {
-        createProject(values.name, values.id, values.description)
+      onSubmit={(values, { setSubmitting, resetForm }) => {
+        createProject(values.name, values.description)
           .then(() => {
             enqueueSnackbar("Create project successfully.", {
               variant: "success",
             });
-            setTimeout(() => document.location.reload(), 1000);
+            resetForm();
           })
           .catch(() => {
             enqueueSnackbar("Failed to create project.", {
@@ -40,6 +38,7 @@ function CreateProject() {
       }}
     >
       {({
+        values,
         errors,
         touched,
         handleChange,
@@ -62,23 +61,13 @@ function CreateProject() {
           <Typography fontWeight="bold">Create new project</Typography>
           <FormField
             required
-            id="project-name"
+            id="create-project-name"
             name="name"
             label="Name"
             type="text"
             hasError={touched.name && !!errors.name}
             errorMessage={errors.name}
-            handleChange={handleChange}
-            handleBlur={handleBlur}
-          />
-          <FormField
-            required
-            id="project-id"
-            name="id"
-            label="Project ID"
-            type="number"
-            hasError={touched.id && !!errors.id}
-            errorMessage={errors.id}
+            value={values.name}
             handleChange={handleChange}
             handleBlur={handleBlur}
           />
@@ -89,6 +78,7 @@ function CreateProject() {
             label="Description"
             hasError={touched.description && !!errors.description}
             errorMessage={errors.description}
+            value={values.description}
             handleChange={handleChange}
             handleBlur={handleBlur}
             multiline

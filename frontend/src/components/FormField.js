@@ -12,6 +12,7 @@ function FormField(props) {
     autoComplete,
     hasError,
     errorMessage,
+    value,
     handleChange,
     handleBlur,
     multiline
@@ -25,6 +26,7 @@ function FormField(props) {
         label={label}
         name={name}
         type={type}
+        value={value}
         autoComplete={autoComplete}
         onChange={handleChange}
         onBlur={handleBlur}
