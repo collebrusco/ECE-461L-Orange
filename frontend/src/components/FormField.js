@@ -12,8 +12,10 @@ function FormField(props) {
     autoComplete,
     hasError,
     errorMessage,
+    value,
     handleChange,
     handleBlur,
+    multiline
   } = props;
   return (
     <Grid item xs={12}>
@@ -24,10 +26,13 @@ function FormField(props) {
         label={label}
         name={name}
         type={type}
+        value={value}
         autoComplete={autoComplete}
         onChange={handleChange}
         onBlur={handleBlur}
         error={hasError}
+        multiline={multiline}
+        rows={4}
       />
       <FormHelperText error={hasError}>
         {hasError && errorMessage}
