@@ -89,7 +89,7 @@ def login():
         return resp
 
 
-@app.route('/register', methods=['POST'])
+@app.route('/user', methods=['POST'])
 def register():
     username = request.form.get("username")
     password = request.form.get("password")
@@ -120,6 +120,15 @@ def register():
 @require_jwt
 def whoami(user: User):
     return Response(status=200, response=user.username)
+
+
+@app.route('/logoff', methods=['POST'])
+def logoff():
+    resp = make_response()
+    resp.set_cookie(key="auth_jwt", value="")
+    resp.status_code = 200
+    resp.response = "OK"
+    return resp
 
 
 @dataclass
