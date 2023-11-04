@@ -9,6 +9,7 @@ import os
 from urllib.parse import unquote
 
 from .setup_db import users_collection, resources_collection, projects_collection
+from .auth import require_jwt, User
 
 def parse_json(data):
     return json.loads(json_util.dumps(data))
@@ -19,12 +20,11 @@ def index():
     return "Welcome to the Flask API!"
 
 @app.route('/projects', methods=["GET"])
-# @jwt_required
-def list_projects():
+@require_jwt
+def list_projects(user: User):
     # TODO: JWT
-    # current_user = get_jwt_identity()  # Get the identity of the current user from the JWT token
-    username = "user1"
-    # username = user.username
+    # username = "user1"
+    username = user.username
    
     # Check if the user exists in the users collection
     current_user = users_collection.find_one({'username': username})
@@ -58,11 +58,11 @@ def list_projects():
     return parse_json(projects_list), 200
 
 @app.route('/projects', methods=['POST'])
-# @jwt_required  
-def create_project():
+@require_jwt
+def create_project(user: User):
     # TODO: JWT
-    # current_user = get_jwt_identity()  # Get the identity of the current user from the JWT token
     username = "user1"
+    username = user.username
    
     # Check if the user exists in the users collection
     current_user = users_collection.find_one({'username': username})
@@ -121,12 +121,13 @@ def create_project():
 
  
 @app.route('/projects/<string:project_title>/users', methods=['POST'])
-def add_user_to_project(project_title):
+@require_jwt
+def add_user_to_project(user: User, project_title):
     
     # TODO: JWT
-    # current_user = get_jwt_identity()  # Get the identity of the current user from the JWT token
     username = "user1"
-   
+    username = user.username
+    
     # Check if the user exists in the users collection
     current_user = users_collection.find_one({'username': username})
     if current_user is None:

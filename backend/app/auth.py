@@ -4,7 +4,10 @@ from flask import request, make_response, Response
 from jwt import decode, ExpiredSignatureError, InvalidSignatureError, DecodeError
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError, VerifyMismatchError, InvalidHash
-from app import app, client, mongo_authdb
+
+from app import app
+from .setup_db import client, mongo_dbname
+
 
 import time
 from datetime import datetime, timedelta
@@ -51,7 +54,7 @@ def require_jwt(f):
 
         except (InvalidSignatureError, DecodeError):
             return Response(status=401, response="Invalid JWT")
-
+        
         return f(user=User(username=jwt.get("username")), *args, **kwargs)
 
     return wrapper
@@ -66,7 +69,7 @@ def login():
 
     # check if user exists
     m = client
-    users = m[mongo_authdb]["users"]
+    users = m[mongo_dbname]["users"]
 
     user = users.find_one({"username": username})
     if user is None:
@@ -97,7 +100,7 @@ def register():
         return Response(status=400, response="Specify both a username and password")
 
     m = client
-    users = m[mongo_authdb]["users"]
+    users = m[mongo_dbname]["users"]
 
     # check if user with same name has already been registered
     if users.find_one({"username": username}) is not None:
