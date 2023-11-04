@@ -7,6 +7,7 @@ client = client
 db = client[mongo_authdb]
 collection = db["test_collection"]
 
+
 @app.route('/')
 def index():
     return "Welcome to the Flask API!"

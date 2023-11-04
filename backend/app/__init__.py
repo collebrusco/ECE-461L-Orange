@@ -4,7 +4,6 @@ from flask import Flask
 from flask_cors import CORS
 from pymongo import MongoClient
 
-
 app = Flask(__name__)
 CORS(app)
 
@@ -27,9 +26,6 @@ try:
 except Exception as e:
     print("Failed to connect to MongoDB:", str(e))
 
-
-
-
-
 from . import views
 from . import auth
+from . import users

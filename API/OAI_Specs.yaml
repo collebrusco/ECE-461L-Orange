@@ -95,6 +95,12 @@ paths:
       summary: Returns true if login correct with JWT corresponding
       description: Logs user in
       operationId: login
+      requestBody:
+        description: Credentials for logging in
+        content:
+          application\json:
+            schema:
+              $ref: '#/components/schemas/Login'
       responses:
         '200':
           description: successful operation
@@ -103,7 +109,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'          
+                  $ref: '#/components/schemas/User'
         '401':
           description: Unauthorized. JWT Token is missing or invalid
       security:
@@ -123,7 +129,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'          
+                  $ref: '#/components/schemas/User'
         '401':
           description: Unauthorized. JWT Token is missing or invalid
       security:
@@ -201,7 +207,7 @@ paths:
           description: Invalid request, tried to check in too many or illegal value
         '401':
           description: Unauthorized. JWT token is missing or invalid.
-        '404': 
+        '404':
           description: Resource not found
   /resources/{resource_id}/checkout:
     post:
@@ -238,7 +244,7 @@ paths:
           description: Invalid request, tried to check out too many or illegal value
         '401':
           description: Unauthorized. JWT token is missing or invalid.
-        '404': 
+        '404':
           description: Resource not found
 components:
   schemas:
@@ -282,6 +288,7 @@ components:
         description:
           type: string
         user_ids:
+
           type: array
           example: [1, 2, 3]
         creator:
@@ -293,6 +300,16 @@ components:
           type: array
           description: array of resource ids
           example: [1, 3, 8]
+    Login:
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
     User:
       required:
         - name
