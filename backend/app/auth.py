@@ -56,7 +56,8 @@ def require_jwt(f):
             return Response(status=401, response="Invalid JWT")
         
         return f(user=User(username=jwt.get("username")), *args, **kwargs)
-
+    # Renaming the function name:
+    wrapper.__name__ = f.__name__
     return wrapper
 
 
