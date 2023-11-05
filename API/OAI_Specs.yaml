@@ -132,7 +132,7 @@ paths:
     get:
       tags:
         - Projects
-      summary: Poject list
+      summary: Project list
       description: receive a list of projects of the user.
       security:
         - JWTAuth: []
