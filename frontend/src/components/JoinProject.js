@@ -21,20 +21,20 @@ function JoinProject() {
       }}
       onSubmit={(values, { setSubmitting, resetForm }) => {
         joinProject(values.projectName)
-        .then(() => {
-          enqueueSnackbar("Joined successfully.", {
-            variant: "success",
+          .then(() => {
+            enqueueSnackbar("Joined successfully.", {
+              variant: "success",
+            });
+          })
+          .catch(() => {
+            enqueueSnackbar("Failed to join project.", {
+              variant: "error",
+            });
+          })
+          .finally(() => {
+            setSubmitting(false);
+            resetForm();
           });
-          resetForm();
-        })
-        .catch(() => {
-          enqueueSnackbar("Failed to join project.", {
-            variant: "error",
-          });
-        })
-        .finally(() => {
-          setSubmitting(false);
-        });
       }}
     >
       {({

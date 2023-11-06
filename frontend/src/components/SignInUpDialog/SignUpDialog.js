@@ -36,7 +36,6 @@ function Form(props) {
             enqueueSnackbar("Signed up successfully.", {
               variant: "success",
             });
-            resetForm();
           })
           .catch(() =>
             enqueueSnackbar("Cannot sign up.", {
@@ -45,6 +44,7 @@ function Form(props) {
           )
           .finally(() => {
             setSubmitting(false);
+            resetForm();
           });
       }}
     >

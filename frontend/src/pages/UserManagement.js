@@ -28,8 +28,8 @@ function ProjectInfo(props) {
 }
 
 function Content() {
-  const { user: { createdAt, username } } = useAuth();
-  const joinedDate = createdAt && format(new Date(createdAt), "MMMM d, yyyy");
+  const { user: { created_at, username } } = useAuth();
+  const joinedDate = created_at && format(new Date(created_at * 1000), "MMMM d, yyyy");
   const { projects } = useStore();
 
   return (
