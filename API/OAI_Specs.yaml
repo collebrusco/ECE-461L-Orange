@@ -20,7 +20,7 @@ paths:
   /users/profile:
     get:
       tags:
-        - User
+        - Users
       summary: Find user by JWT
       description: Returns a single user
       operationId: getUserById
@@ -132,7 +132,7 @@ paths:
     get:
       tags:
         - Projects
-      summary: Project list
+      summary: Poject list
       description: receive a list of projects of the user.
       security:
         - JWTAuth: []
@@ -288,28 +288,36 @@ paths:
                   $ref: '#/components/schemas/Resource'
         '401':
           description: Unauthorized. JWT token is missing or invalid.
-  /resources/{resource_id}/checkin:
+  /resources/{resource_title}/checkin:
     post:
       tags:
         - Resources
       summary: Checks in specified amount of resource
       parameters:
-        - name: resource_id
+        - name: resource_title
           in: path
           description: ID of resource to checkin
           required: true
           schema:
             type: integer
             format: int64
-        - name: amount
-          in: query
-          description: amount of resources to checkin
-          required: true
-          schema:
-            type: integer
       description: check specified amount of resources in
       security:
         - JWTAuth: []
+      requestBody:
+        description: Check in resource by amount on the behalf of a project
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                project_title:
+                  type: string
+                  example: "Project 1"
+                amount:
+                  type: integer
+                  example: 10
       responses:
         '200':
           description: successful operation
@@ -325,28 +333,36 @@ paths:
           description: Unauthorized. JWT token is missing or invalid.
         '404': 
           description: Resource not found
-  /resources/{resource_id}/checkout:
+  /resources/{resource_title}/checkout:
     post:
       tags:
         - Resources
       summary: Checks out specified amount of resource
       parameters:
-        - name: resource_id
+        - name: resource_title
           in: path
           description: ID of resource to checkout
           required: true
           schema:
             type: integer
             format: int64
-        - name: amount
-          in: query
-          description: amount of resources to checkout
-          required: true
-          schema:
-            type: integer
       description: check specified amount of resources out
       security:
         - JWTAuth: []
+      requestBody:
+        description: Check in resource by amount on the behalf of a project
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                project_title:
+                  type: string
+                  example: "Project 1"
+                amount:
+                  type: integer
+                  example: 10
       responses:
         '200':
           description: successful operation
@@ -367,24 +383,20 @@ components:
     Resource:
       required:
         - id
+        - title
       properties:
         id:
           type: integer
           format: int64
           example: 10
+        title:
+          type: string
         capacity:
           type: integer
           example: 100
         availability:
           type: integer
           example: 30
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-            - type1
-            - type2
         created_at:
           type: string
           format: date-time
@@ -403,18 +415,29 @@ components:
           example: Project 1
         description:
           type: string
-        user_ids:
+        users:
           type: array
-          example: [1, 2, 3]
+          example: ["user1", "user2", "user3"]
         creator:
-          type: integer
-          description: User id of Creator
-          format: int64
-          example: 10
+          type: string
+          description: Username of Creator
+          example: "user1"
         resources:
-          type: array
-          description: array of resource ids
-          example: [1, 3, 8]
+          type: object
+          properties:
+            "HW Set 1":
+              type: integer
+              format: int64
+              example: 10
+            "HW Set 2":
+              type: integer
+              format: int64
+              example: 10
+            "HW Set 3":
+              type: integer
+              format: int64
+              example: 10
+            
     User:
       required:
         - name
@@ -434,10 +457,10 @@ components:
           type: string
           format: date-time
           example: "2017-07-21T17:32:28Z" # https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
-        project_ids:
+        projects:
           type: array
-          items:
-            $ref: '#/components/schemas/Projects'
+          example: ["project 1", "project 2"]
+            
   requestBodies:
     User:
       description: User object
