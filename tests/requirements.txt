@@ -2,3 +2,4 @@ pytest
 pytest_check
 flask
 flask_requests
+pymongo
