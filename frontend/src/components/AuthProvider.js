@@ -43,17 +43,17 @@ export default function AuthProvider({ children }) {
 
   const doSignUp = React.useCallback((username, password) => {
     setStatus(AUTH_STATUS.PENDING);
-    return signup(username, password).then(updateUser);
+    return signup(username, password).finally(updateUser);
   }, []);
 
   const doSignIn = React.useCallback((username, password) => {
     setStatus(AUTH_STATUS.PENDING);
-    return signin(username, password).then(updateUser);
+    return signin(username, password).finally(updateUser);
   }, []);
 
   const doSignOut = React.useCallback(() => {
     setStatus(AUTH_STATUS.PENDING);
-    return signout().then(updateUser);
+    return signout().finally(updateUser);
   }, []);
 
   React.useEffect(() => {
