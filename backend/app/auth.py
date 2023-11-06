@@ -115,7 +115,7 @@ def register():
 
     # insert into users table
     users.insert_one({"username": username, "password": password_hash, "created_at": created_at,
-                      "projects": {}})
+                      "projects": []})
 
     return Response(status=200)
 

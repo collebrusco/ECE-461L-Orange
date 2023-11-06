@@ -72,18 +72,23 @@ def create_project(user: User):
     # Create a new project
     try:
         data = request.get_json()
-        title = data.get('title')
         
-        # TODO: Check project title duplicate
+        # Check if 'title' and 'description' are present in the request JSON
+        if 'title' not in data or 'description' not in data:
+            return jsonify({"msg": "Title and description are required fields"}), 500
+        
+        title = data.get('title')
+        description = data.get('description')
+        
+        # Check project title duplicate
         existing_project = projects_collection.find_one({'title': title})
         if existing_project:
             return jsonify({"msg": "Project title already exists"}), 500
 
-        description = data.get('description')
         
         users = [] # users not provided
         resources = [] # resources not provided
-        # TODO: directly frm JWT
+        # directly frm JWT
         creator = username 
 
         # Add creator as total users in this project
@@ -127,7 +132,7 @@ def add_user_to_project(user: User, project_title):
     # TODO: JWT
     username = "user1"
     username = user.username
-    
+
     # Check if the user exists in the users collection
     current_user = users_collection.find_one({'username': username})
     if current_user is None:
@@ -160,7 +165,7 @@ def add_user_to_project(user: User, project_title):
             return jsonify({"msg": "User is already in the project"}), 500
 
         # Update the user's projects list
-        users_collection.update_one({"username": user},
+        users_collection.update_one({"username": user_add},
                                     {"$addToSet": {"projects": project["title"]}})
 
         # Add user to the project
