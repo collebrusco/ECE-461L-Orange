@@ -25,7 +25,6 @@ function CreateProject() {
             enqueueSnackbar("Create project successfully.", {
               variant: "success",
             });
-            resetForm();
           })
           .catch(() => {
             enqueueSnackbar("Failed to create project.", {
@@ -34,6 +33,7 @@ function CreateProject() {
           })
           .finally(() => {
             setSubmitting(false);
+            resetForm();
           });
       }}
     >

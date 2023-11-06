@@ -1,6 +1,6 @@
 import secrets
 from dataclasses import dataclass
-from flask import request, make_response, Response
+from flask import request, make_response, Response, jsonify
 from jwt import decode, ExpiredSignatureError, InvalidSignatureError, DecodeError
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError, VerifyMismatchError, InvalidHash
@@ -61,7 +61,7 @@ def require_jwt(f):
     return wrapper
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/users/login', methods=['POST'])
 def login():
     username = request.form.get('username')
     password = request.form.get('password')
@@ -93,7 +93,7 @@ def login():
         return resp
 
 
-@app.route('/user', methods=['POST'])
+@app.route('/users', methods=['POST'])
 def register():
     username = request.form.get("username")
     password = request.form.get("password")
@@ -117,19 +117,37 @@ def register():
     users.insert_one({"username": username, "password": password_hash, "created_at": created_at,
                       "projects": []})
 
-    return Response(status=200)
+    # Issue jwt
+    token = encode({"username": username, "exp": datetime.now() + timedelta(hours=24)}, get_secret(),
+                    algorithm="HS256")
+    resp = make_response("OK")
+    resp.status_code = 200
+    resp.set_cookie("auth_jwt", token)
+    return resp
 
 
-@app.route('/whoami', methods=['GET'])
+@app.route('/users/profile', methods=['GET'])
 @require_jwt
 def whoami(user: User):
-    return Response(status=200, response=user.username)
+    username = user.username
+
+    # Check if the user exists in the users collection
+    users = client[mongo_dbname]["users"]
+    user = users.find_one({'username': username})
+    if user is None:
+        return jsonify({"msg": "User not found"}), 401
+
+    return jsonify({
+        "username": user["username"],
+        "created_at": user["created_at"],
+        "projects": user["projects"],
+    }), 200
 
 
-@app.route('/logoff', methods=['POST'])
+@app.route('/users/logout', methods=['POST'])
 def logoff():
     resp = make_response()
-    resp.set_cookie(key="auth_jwt", value="")
+    resp.delete_cookie("auth_jwt")
     resp.status_code = 200
     resp.response = "OK"
     return resp

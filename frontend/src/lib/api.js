@@ -1,45 +1,53 @@
 import { RESOURCES } from "./data";
 
-function getUsers() {
-  const users = localStorage.getItem("users");
-  return users ? JSON.parse(users) : {};
-}
-
-function setCurrentUser(username) {
-  const users = getUsers();
-  localStorage.setItem("currentUser", JSON.stringify({
-    ...users[username],
-    username
-  }));
-}
+const API_URL = "http://127.0.0.1:8888";
 
 export async function signup(username, password) {
-  const users = getUsers();
-  if (username in users) {
-    return false;
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("password", password);
+  const res = await fetch(`${API_URL}/users`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+  if (!res.ok) {
+    throw new Error("Failed to sign up.");
   }
-  users[username] = { password, createdAt: new Date().toISOString() };
-  localStorage.setItem("users", JSON.stringify(users));
-  setCurrentUser(username);
-  return true;
 }
 
 export async function signin(username, password) {
-  const users = getUsers();
-  if (username in users && users[username].password === password) {
-    setCurrentUser(username);
-    return true;
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("password", password);
+  const res = await fetch(`${API_URL}/users/login`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+  if (!res.ok) {
+    throw new Error("Failed to sign in.");
   }
-  return false;
 }
 
 export async function getCurrentUser() {
-  const currentUser = localStorage.getItem("currentUser");
-  return currentUser ? JSON.parse(currentUser) : "";
+  const res = await fetch(`${API_URL}/users/profile`, {
+    credentials: "include",
+  });
+  if (!res.ok) {
+    return {};
+  }
+  return res.json();
 }
 
 export async function signout() {
-  return localStorage.removeItem("currentUser");
+  const res = await fetch(`${API_URL}/users/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to sign out.");
+  }
 }
 
 function getProjects() {
@@ -48,47 +56,39 @@ function getProjects() {
 }
 
 export async function getUserProjects() {
-  const { username } = await getCurrentUser();
-  if (!username) return [];
-  const projects = getProjects();
-  const userProjects = projects.filter(
-    (project) => project.users.indexOf(username) !== -1
-  );
-  return userProjects;
+  const res = await fetch(`${API_URL}/projects`, {
+    credentials: "include",
+  });
+  if (!res.ok) {
+    return [];
+  }
+  return res.json();
 }
 
 export async function createProject(name, description) {
-  const { username } = await getCurrentUser();
-  const projects = getProjects();
-  if (projects.find((project) => project.title === name)) {
-    throw new Error("Project already exists");
-  }
-  projects.push({
-    title: name,
-    description: description,
-    users: [username],
-    creator: username,
-    resources: {
-      "HW Set 1": 0,
-      "HW Set 2": 0,
-      "HW Set 3": 0,
+  const res = await fetch(`${API_URL}/projects`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({ title: name, description }),
   });
-  localStorage.setItem("projects", JSON.stringify(projects));
+  if (!res.ok) {
+    const data = await res.json();
+    console.error(data.msg);
+    throw new Error(data.msg);
+  }
 }
 
 export async function joinProject(projectName) {
-  const { username } = await getCurrentUser();
-  const projects = getProjects();
-  const project = projects.find((project) => project.title === projectName);
-  if (!project) {
-    throw new Error("Project not found");
+  const res = await fetch(`${API_URL}/projects/${projectName}/users`, {
+    method: "POST",
+    credentials: "include",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to join project.");
   }
-  if (project.users.indexOf(username) !== -1) {
-    throw new Error("Already joined");
-  }
-  project.users.push(username);
-  localStorage.setItem("projects", JSON.stringify(projects));
 }
 
 export async function getResources() {
