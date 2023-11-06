@@ -185,6 +185,12 @@ paths:
           required: true
           schema:
             type: integer
+        - name: project_id
+          in: query
+          description: id of the project we will be checking from
+          required: true
+          schema:
+            type: String
       description: check specified amount of resources in
       security:
         - JWTAuth: []
@@ -222,6 +228,12 @@ paths:
           required: true
           schema:
             type: integer
+        - name: project_id
+          in: query
+          description: id of the project we will be checking from
+          required: true
+          schema:
+            type: String
       description: check specified amount of resources out
       security:
         - JWTAuth: []
