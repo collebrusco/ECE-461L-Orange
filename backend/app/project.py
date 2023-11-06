@@ -87,7 +87,7 @@ def create_project(user: User):
 
         
         users = [] # users not provided
-        resources = {"Resource 1" : 0, "Resource 2": 0, "Resource 3": 0} # resources set as default
+        resources = {"HW Set 1" : 0, "HW Set 2": 0, "HW Set 3": 0} # resources set as default
         # directly frm JWT
         creator = username 
 
