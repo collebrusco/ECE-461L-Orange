@@ -11,7 +11,7 @@ Table projects {
   title string
   description string
   creator string              # "Alice"
-  user Array                  # ["Alice", "Bob"]
+  users Array                 # ["Alice", "Bob"]
   resources Object            # resource title -> checked-out quantity
                               # example: {
                               #   "HW Set 1": 10,
