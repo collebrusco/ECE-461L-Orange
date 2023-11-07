@@ -1,475 +1,343 @@
-# Paste in https://editor.swagger.io/ to see what it looks like
 openapi: 3.0.3
 info:
-  title: ECE_461L - OpenAPI
-  description: |-
-    This is the rough specifications for what our API will be doing
-  version: 1.0.01
+  title: ECE-461L-Orange
+  description: Team project for UT ECE 461L
+  version: 1.0.0
 externalDocs:
-  description: Google Drive Link
-  url: https://drive.google.com/drive/u/2/folders/1R8sgbDksbZiwOycuF396ZUm8Dv0tAQy7
+  description: Google Drive
+  url: https://drive.google.com/drive/folders/1R8sgbDksbZiwOycuF396ZUm8Dv0tAQy7?usp=sharing
 servers:
-  - url: our_server_here.com
+  - url: https://teamorange.duckdns.org/api
 tags:
-  - name: Projects
   - name: Users
-    description: Operations about Users
+    description: Operations about users
+  - name: Projects
+    description: Operations about projects
   - name: Resources
     description: Operations about resources
 paths:
-  /users/profile:
-    get:
-      tags:
-        - Users
-      summary: Find user by JWT
-      description: Returns a single user
-      operationId: getUserById
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          description: User not found
-        '401':
-          description: Unauthorized. JWT Token is missing or invalid
-      security:
-        - JWTAuth: []
-    put:
-      tags:
-        - Users
-      summary: Update 
-      description: Update an user by JWT Token
-      operationId: updateUser
-      requestBody:
-        description: Update an existent User
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'          
-        '404':
-          description: User not found
-        '401':
-          description: Unauthorized. JWT Token is missing or invalid
-      security:
-        - JWTAuth: []
-  /users:  
+  # Users
+  /users:
     post:
       tags:
         - Users
-      summary: Add a new user
-      description: Add a user
-      operationId: addUser
+      summary: Register a new user
+      operationId: register
       requestBody:
-        description: Create a new user
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
+        $ref: '#/components/requestBodies/Credentials'
       responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'          
+        '201':
+          description: Register successfully
         '400':
-          description: Invalid input
-        '401':
-          description: Unauthorized. JWT Token is missing or invalid
+          description: Invalid credentials
+        '409':
+          description: User already registered
+        '500':
+          $ref: '#/components/responses/ServerErrorResponse'
   /users/login:
     post:
       tags:
         - Users
-      summary: Returns true if login correct with JWT corresponding
-      description: Logs user in
+      summary: Login with credentials
       operationId: login
+      requestBody:
+        $ref: '#/components/requestBodies/Credentials'
       responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'          
+        '204':
+          description: Login successfully
         '401':
-          description: Unauthorized. JWT Token is missing or invalid
-      security:
-        - JWTAuth: []
+          description: Login failed
+        '500':
+          $ref: '#/components/responses/ServerErrorResponse'
   /users/logout:
     post:
       tags:
         - Users
-      summary: Returns true if logout correct with JWT corresponding
-      description: Logs user out
+      summary: Log out current user identified by JWT
       operationId: logout
+      security:
+        - JWTAuth: []
+      responses:
+        '204':
+          description: Logout successfully
+        '401':
+          description: JWT Token is missing or invalid
+        '500':
+          $ref: '#/components/responses/ServerErrorResponse'
+  /users/profile:
+    get:
+      tags:
+        - Users
+      summary: Get profile for current user identified by JWT
+      operationId: getProfile
+      security:
+        - JWTAuth: []
       responses:
         '200':
-          description: successful operation
+          description: Get profile successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'          
+                $ref: '#/components/schemas/UserProfile'
         '401':
-          description: Unauthorized. JWT Token is missing or invalid
-      security:
-        - JWTAuth: []
+          description: JWT Token is missing or invalid
+        '500':
+          $ref: '#/components/responses/ServerErrorResponse'
+
+  # Projects
   /projects:
     get:
       tags:
         - Projects
-      summary: Poject list
-      description: receive a list of projects of the user.
+      summary: Get the list of projects for current user identified by JWT
+      operationId: getProjects
       security:
         - JWTAuth: []
       responses:
         '200':
-          description: Access granted. Returns secure data.
-          content:
-            application/json:
-              example:
-                - id: 2
-                  title: Project 1
-                  description: This is for project 1
-                  users:
-                    - Mimi
-                    - Frank
-                    - Ayan
-                  creator: Mimi
-                  resources:
-                    "Title 1": 3 # title -> usage
-                    "Title 2": 2
-                - id: 4
-                  title: Project 2
-                  description: This is for project 2
-                  users:
-                    - Frank
-                    - Ayan
-                  creator: Ayan
-                  resources:
-                    "Title 1": 3 # title -> usage
-                    "Title 2": 2
-        '401':
-          description: Unauthorized. JWT token is missing or invalid.
-          content:
-            application/json:
-              example:
-                msg: User not found
-    post:
-      summary: Create a new project for a user
-      security:
-        - JWTAuth: []
-      tags: 
-        - Projects
-      requestBody:
-        description: Project data
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  description: Project title
-                description:
-                  type: string
-                  description: Project description
-    
-      responses:
-        '200':
-          description: Project created successfully
+          description: Get projects successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  projectId:
-                    type: integer
-                    description: ID of the created project
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
         '401':
-          description: Unauthorized. JWT token is missing or invalid.
-          content:
-            application/json:
-              example:
-                msg: User not found
+          description: JWT Token is missing or invalid
         '500':
-          description: Internal server error. Failed to create the project.
-          content:
-            application/json:
-              example:
-                msg: error message
-  /projects/{project_title}/users:
+          $ref: '#/components/responses/ServerErrorResponse'
     post:
-      summary: "Add a new user to the project"
-      description: "Add a new user to the specified project."
       tags:
         - Projects
+      summary: Create a new project for current user identified by JWT
+      operationId: createProjects
+      security:
+        - JWTAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectInit'
+      responses:
+        '201':
+          description: Project created successfully
+        '400':
+          description: Invalid project info
+        '401':
+          description: JWT Token is missing or invalid
+        '409':
+          description: Project has a conflicting name
+        '500':
+          $ref: '#/components/responses/ServerErrorResponse'
+  /projects/{project_title}/users:
+    post:
+      tags:
+        - Projects
+      summary: Add current user identified by JWT to the project
+      operationId: joinProject
       security:
         - JWTAuth: []
       parameters:
-        - name: "project_title"
-          in: "path"
-          description: "Name of the project to which the user will be added"
-          required: true
-          schema:
-            type: "string"
-          example: "Project 1"
-      # requestBody:
-      #   required: false
-      #   content:
-      #     application/json:
-      #       schema:
-      #         type: "object"
-      #         properties:
-      #           userId:
-      #             type: "string"
-      #             description: "Name of the user to be added to the project"
-      #             example: "Mimi" # not required, if not provided, add yourself
-              
+        - $ref: '#/components/parameters/project_title'
       responses:
-        '200':
-          description: "User added to the project successfully"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  msg:
-                    type: "string"
-                    example: "User added to the project successfully"
+        '201':
+          description: User added to the project successfully
         '401':
-          description: Unauthorized. JWT token is missing or invalid.
-          content:
-            application/json:
-              example:
-                msg: User not found
-       
+          description: JWT Token is missing or invalid
+        '404':
+          description: Project does not exist
         '500':
-          description: "Internal Server Error: Failed to add user to the project"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  msg:
-                    type: "string"
-                    example: "error message"
+          $ref: '#/components/responses/ServerErrorResponse'
+
+  # Resources
   /resources:
     get:
       tags:
         - Resources
-      summary: Resource list of all users
-      description: receive a list of resources.
-      security:
-        - JWTAuth: []
+      summary: Get the list of all resources
       responses:
         '200':
-          description: successful operation
+          description: Get projects successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Resource'
-        '401':
-          description: Unauthorized. JWT token is missing or invalid.
+        '500':
+          $ref: '#/components/responses/ServerErrorResponse'
   /resources/{resource_title}/checkin:
     post:
       tags:
         - Resources
-      summary: Checks in specified amount of resource
-      parameters:
-        - name: resource_title
-          in: path
-          description: ID of resource to checkin
-          required: true
-          schema:
-            type: integer
-            format: int64
-      description: check specified amount of resources in
+      summary: Check in by some amount on the behalf of specified project
+      operationId: checkin
       security:
         - JWTAuth: []
+      parameters:
+        - $ref: '#/components/parameters/resource_title'
       requestBody:
-        description: Check in resource by amount on the behalf of a project
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                project_title:
-                  type: string
-                  example: "Project 1"
-                amount:
-                  type: integer
-                  example: 10
+        $ref: '#/components/requestBodies/CheckInOutInfo'
       responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Resource'
+        '204':
+          description: Check in successfully
         '400':
-          description: Invalid request, tried to check in too many or illegal value
+          description: Check in too many or illegal value
         '401':
-          description: Unauthorized. JWT token is missing or invalid.
-        '404': 
-          description: Resource not found
+          description: JWT Token is missing or invalid
+        '403':
+          description: User identified by JWT not in project
+        '404':
+          description: Resource/Project not found
+        '500':
+          $ref: '#/components/responses/ServerErrorResponse'
   /resources/{resource_title}/checkout:
     post:
       tags:
         - Resources
-      summary: Checks out specified amount of resource
-      parameters:
-        - name: resource_title
-          in: path
-          description: ID of resource to checkout
-          required: true
-          schema:
-            type: integer
-            format: int64
-      description: check specified amount of resources out
+      summary: Check out by some amount on the behalf of specified project
+      operationId: checkout
       security:
         - JWTAuth: []
+      parameters:
+        - $ref: '#/components/parameters/resource_title'
       requestBody:
-        description: Check in resource by amount on the behalf of a project
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                project_title:
-                  type: string
-                  example: "Project 1"
-                amount:
-                  type: integer
-                  example: 10
+        $ref: '#/components/requestBodies/CheckInOutInfo'
       responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Resource'
+        '204':
+          description: Check out successfully
         '400':
-          description: Invalid request, tried to check out too many or illegal value
+          description: Check out too many or illegal value
         '401':
-          description: Unauthorized. JWT token is missing or invalid.
-        '404': 
-          description: Resource not found
+          description: JWT Token is missing or invalid
+        '403':
+          description: User identified by JWT not in project
+        '404':
+          description: Resource/Project not found
+        '500':
+          $ref: '#/components/responses/ServerErrorResponse'
+
 components:
   schemas:
-    Resource:
-      required:
-        - id
-        - title
+    UserProfile:
+      type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
+        username:
+          type: string
+          example: spenc
+        created_at:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+    Credentials:
+      type: object
+      properties:
+        username:
+          type: string
+          example: spenc
+        password:
+          type: string
+          example: pa55w0rd
+    Project:
+      type: object
+      properties:
         title:
           type: string
+          example: Project 1
+        description:
+          type: string
+          example: This is the description of Project 1
+        users:
+          type: array
+          items:
+            type: string
+          example: ["Mimi", "Frank", "Ayan"]
+        creator:
+          type: string
+          example: Mimi
+        resources:
+          type: object
+          example: {
+              "HW Set 1": 3,
+              "HW Set 2": 2
+          }
+    ProjectInit:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Project 1
+        description:
+          type: string
+          example: This is the description of Project 1
+    Resource:
+      type: object
+      properties:
+        title:
+          type: string
+          example: HW Set 1
         capacity:
           type: integer
           example: 100
         availability:
           type: integer
           example: 30
-        created_at:
-          type: string
-          format: date-time
-          example: "2017-07-21T17:32:28Z" # https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
-    Projects:
-      required:
-        - id
-        - title
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
-        title:
-          type: string
-          example: Project 1
-        description:
-          type: string
-        users:
-          type: array
-          example: ["user1", "user2", "user3"]
-        creator:
-          type: string
-          description: Username of Creator
-          example: "user1"
-        resources:
-          type: object
-          properties:
-            "HW Set 1":
-              type: integer
-              format: int64
-              example: 10
-            "HW Set 2":
-              type: integer
-              format: int64
-              example: 10
-            "HW Set 3":
-              type: integer
-              format: int64
-              example: 10
-            
-    User:
-      required:
-        - name
-        - id
+    CheckInOutInfo:
       type: object
       properties:
-        id:
+        project_title:
+          type: string
+          example: Project 1
+        amount:
           type: integer
-          format: int64
           example: 10
-        username:
-          type: string
-          example: spenc
-        password:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-          example: "2017-07-21T17:32:28Z" # https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
-        projects:
-          type: array
-          example: ["project 1", "project 2"]
-            
+  parameters:
+    project_title:
+      name: project_title
+      in: path
+      required: true
+      schema:
+        type: string
+      example: Project 1
+    resource_title:
+      name: resource_title
+      in: path
+      required: true
+      schema:
+        type: string
+      example: HW Set 1
   requestBodies:
-    User:
-      description: User object
+    Credentials:
+      description: JSON object containing authentication credentials
+      required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/User'
+            $ref: '#/components/schemas/Credentials'
+    ProjectInit:
+      description: JSON object containing project information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProjectInit'
+    CheckInOutInfo:
+      description: JSON object containing checkin/checkout information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CheckInOutInfo'
+  responses:
+    ServerErrorResponse:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Unhandled exception raised
   securitySchemes:
     JWTAuth:
       type: apiKey
       in: cookie
-      name: JWT
+      name: auth_jwt
