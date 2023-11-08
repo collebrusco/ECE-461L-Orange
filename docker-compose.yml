@@ -9,6 +9,7 @@ services:
     profiles:
       - dev
       - ci
+      - ssl
 
   backend:
     image: "spencshis/ecl-461l-orange:backend"
@@ -28,6 +29,7 @@ services:
     profiles:
       - dev
       - ci
+      - ssl
 
   mongodb:
     image: mongo:latest
@@ -41,6 +43,7 @@ services:
     profiles:
       - dev
       - ci
+      - ssl
 
   watchtower:
     image: containrrr/watchtower
@@ -50,6 +53,7 @@ services:
     command: backend frontend
     profiles:
       - ci
+      - ssl
 
   nginx:
     image: nginx:latest
@@ -61,7 +65,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt/:/etc/letsencrypt
     profiles:
-      - dev
+      - ssl
       - ci
 
 volumes:
