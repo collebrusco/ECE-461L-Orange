@@ -41,8 +41,8 @@ def initialize_mongodb():
 
    # Sample data
     sample_users = [
-        {"username": "user1", "password": "password1", "created_at": datetime.now(), "projects": []},
-        {"username": "user2", "password": "password2", "created_at": datetime.now(), "projects": []}
+        {"username": "user1", "password": '$argon2id$v=19$m=65536,t=3,p=4$9rfKjqg1IIsFNganHXQquw$ozPO5qzrEBq4hCALxmWH6+pXXmyvmon7R1uyKc/dCEI', "created_at": datetime.now(), "projects": []},
+        {"username": "user2", "password": '$argon2id$v=19$m=65536,t=3,p=4$i6gb55DAJ54Ub/RAwxyw2w$2d8mfkSZybD4xoJnw8UrIvs6W3r8u4ad1haYXLQx5gI', "created_at": datetime.now(), "projects": []}
     ]
 
     sample_resources = [
