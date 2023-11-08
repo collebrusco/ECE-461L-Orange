@@ -6,6 +6,9 @@ services:
       context: ./frontend
     ports:
       - "3000:3000"
+    profiles:
+      - dev
+      - ci
 
   backend:
     image: "spencshis/ecl-461l-orange:backend"
@@ -22,6 +25,9 @@ services:
       MONGO_PASSWORD: examplepassword  # MongoDB initial root password
       MONGO_AUTHDB: admin  # Authentication database (default is "admin")
       MONGO_DB: admindb    # MongoDB database name
+    profiles:
+      - dev
+      - ci
 
   mongodb:
     image: mongo:latest
@@ -32,6 +38,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: examplepassword  # MongoDB initial root password
     volumes:
       - mongodb_data:/data/db
+    profiles:
+      - dev
+      - ci
 
   watchtower:
     image: containrrr/watchtower
@@ -39,6 +48,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: backend frontend
+    profiles:
+      - ci
 
   nginx:
     image: nginx:latest
@@ -49,6 +60,9 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
 #      - /etc/letsencrypt/:/etc/letsencrypt
+    profiles:
+      - dev
+      - ci
 
 volumes:
   mongodb_data:
