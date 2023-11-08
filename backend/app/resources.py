@@ -30,6 +30,19 @@ def checkout(resource_title):
     if amount is None:
         return Response(status=400, response="Malformed Request: No amount provided")
     
+    # Get our project data and amount checked in
+    info = request.args.get('CheckInOutInfo')
+    
+    if info is None:
+        return Response(status=400, response="Malformed Request: No CheckinOutinfo provided")
+    
+    # Get our project we are checking from
+    project = client["projects"].find_one({'title': info["project_title"]})
+    
+    # Verify that our project has access to this set
+    if project["resources"][resource_title] is None:
+        return Response(status=403, response="Project has not joined resource")
+    
     # Get our resource
     resources = client["resources"]
     resource = resources.find_one({"title": resource_title})
@@ -41,10 +54,12 @@ def checkout(resource_title):
     # If we have enough available to check out 
     if resource["availability"] < amount:
         return Response(status=400, response="Tried to check out too many")
-    else:
-        resource["availability"] = resource["availability"] + amount
-        # Update Resource in DB
-        client["resources"].update_one({"title": resource_title}, resource)
+      
+    resource["availability"] = resource["availability"] + amount
+    project["resources"][resource_title] += amount
+    # Update Resource in DB
+    client["resources"].update_one({"title": resource_title}, resource)
+    client["projects"].update_one({'title': info["project_title"]})
     
     return Response(status=200, response=jsonify(resource), content_type="application/json")
 
@@ -58,10 +73,23 @@ def checkin(resource_title):
     
     # Get our amount from query
     amount = request.args.get('amount')
-    
+
     # Verify We got Amount
     if amount is None:
         return Response(status=400, response="Malformed Request: No amount provided")
+    
+    # Get our project data and amount checked in
+    info = request.args.get('CheckInOutInfo')
+    
+    if info is None:
+        return Response(status=400, response="Malformed Request: No CheckinOutinfo provided")
+    
+    # Get our project we are checking from
+    project = client["projects"].find_one({'title': info["project_title"]})
+    
+    # Verify that our project has access to this set
+    if project["resources"][resource_title] is None:
+        return Response(status=403, response="Project has not joined resource")
     
     # Get our resource
     resources = client["resources"]
@@ -74,9 +102,15 @@ def checkin(resource_title):
     # If we are not exceeding capacity TODO: Make this if we are not exceeding the amount specified project has checked in
     if resource["capacity"] < amount + resource["availability"]:
         return Response(status=400, response="Tried to check in too many")
-    else:
-        resource["availability"] = resource["availability"] + amount
-        # Update Resource in DB
-        client["resources"].update_one({"title": resource_title}, resource)
+    if project["resources"][resource_title] < amount:
+        return Response(status=400, response="Tried to check in too many")
+    
+    resource["availability"] = resource["availability"] + amount
+    project["resources"][resource_title] -= amount
+    # Update Resource in DB
+    client["resources"].update_one({"title": resource_title}, resource)
+    client["projects"].update_one({'title': info["project_title"]})
+
+
     
     return Response(status=200, response=jsonify(resource), content_type="application/json")
