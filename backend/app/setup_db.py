@@ -31,6 +31,19 @@ users_collection = db["users"]
 resources_collection = db["resources"]  
 projects_collection = db["projects"]  
 
+# Initialize resources
+sample_resources = [
+    {"capacity": 100, "availability": 100, "title": "HW Set 1", "created_at": datetime.now()},
+    {"capacity": 200, "availability": 200, "title": "HW Set 2", "created_at": datetime.now()},
+    {"capacity": 300, "availability": 300, "title": "HW Set 3", "created_at": datetime.now()}
+]
+# Check if the collection already exists
+if resources_collection.find_one():
+    print("Resources collection already initialized.")
+else:
+    # Insert data into MongoDB collections
+    print("Resources collection created.")
+    resources_collection.insert_many(sample_resources)
 
 # Initialize mongodb
 @app.route('/initialize-mongodb', methods=['GET'])
