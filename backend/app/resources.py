@@ -1,116 +1,89 @@
 import time
 from flask import make_response, request, Response, jsonify
 from app import app, client, mongo_authdb
-
+from .setup_db import client, users_collection, resources_collection, projects_collection
 from .auth import check_hash, encode, require_jwt, get_hash, User
+
+from urllib.parse import unquote
 
 
 @app.route('resources', methods=['GET'])
 @require_jwt
 def all_resources():
+    return jsonify(resources_collection)
     
-
-    # grab resources from table
-    resources = client["resources"]
-
-    return Response(status=200, response=resources, content_type="application/json")
-
-@app.route('resources/{resource_title}/checkout', methods='[POST]')
+@app.route('resources/<string:resource_title>/checkout', methods='[POST]')
 @require_jwt
 def checkout(resource_title):
-    # TODO: Get project from request body and update it
     # if resource_title NULL or not a string
-    if not resource_title:
-        return Response(status=400, response="Malformed request")
-    
-    # Get our amount from query
-    amount = request.args.get('amount')
-    
-    # Verify We got Amount
-    if amount is None:
-        return Response(status=400, response="Malformed Request: No amount provided")
-    
-    # Get our project data and amount checked in
-    info = request.args.get('CheckInOutInfo')
-    
-    if info is None:
-        return Response(status=400, response="Malformed Request: No CheckinOutinfo provided")
-    
-    # Get our project we are checking from
-    project = client["projects"].find_one({'title': info["project_title"]})
-    
-    # Verify that our project has access to this set
-    if project["resources"][resource_title] is None:
-        return Response(status=403, response="Project has not joined resource")
-    
-    # Get our resource
-    resources = client["resources"]
-    resource = resources.find_one({"title": resource_title})
+    try:
+        resource_title = unquote(resource_title)
+        if not resource_title:
+            return jsonify({"msg": "Malformed request, no resource title"}), 400
+        
+        # Get our amount from query
+        data = request.get_json()
+        if "project_title" not in data or "amount" not in data:
+            return jsonify({"msg": "project_title and amount are required fields"}), 500
+        amount = data.get('amount')
+        project = projects_collection.find_one({'title': data.get('project_title')})
+        
+        # Get our resource
+        resource = resources_collection.find_one({"title": resource_title})
 
-    # Check to see if we have specified resource
-    if resource is None:
-        return Response(status=404, response="Resource not found")
-    
-    # If we have enough available to check out 
-    if resource["availability"] < amount:
-        return Response(status=400, response="Tried to check out too many")
-      
-    resource["availability"] = resource["availability"] + amount
-    project["resources"][resource_title] += amount
-    # Update Resource in DB
-    client["resources"].update_one({"title": resource_title}, resource)
-    client["projects"].update_one({'title': info["project_title"]})
-    
-    return Response(status=200, response=jsonify(resource), content_type="application/json")
+        # Check to see if we have specified resource
+        if resource is None:
+            return jsonify({"msg": "Resource not found"}), 404
+        
+        # If we have enough available to check out 
+        if resource["availability"] < amount:
+            return jsonify({"msg": "Tried to check out too many"}), 400
+        
+        resource["availability"] = resource["availability"] + amount
+        project["resources"][resource_title] += amount
+        # Update Resource in DB
+        resources_collection.update_one({"title": resource_title}, resource)
+        projects_collection.update_one({'title': info["project_title"]})
+        
+        return jsonify(resource), 200
+    except Exception as e:
+        return jsonify({"msg": str(e)}), 500
 
-@app.route('resources/{resource_title}/checkin', methods='[POST]')
+@app.route('resources/<string:resource_title>/checkin', methods='[POST]')
 @require_jwt
 def checkin(resource_title):
-    # TODO: Get project from request body and update it
     # if resource_title NULL or not a string
-    if not resource_title:
-        return Response(status=400, response="Malformed request")
-    
-    # Get our amount from query
-    amount = request.args.get('amount')
+    try:
+        resource_title = unquote(resource_title)
+        if not resource_title:
+            return jsonify({"msg": "Malformed request, no resource title"}), 400
+        
+        # Get our amount from query
+        data = request.get_json()
+        if "project_title" not in data or "amount" not in data:
+            return jsonify({"msg": "project_title and amount are required fields"}), 500
+        amount = data.get('amount')
+        project = projects_collection.find_one({'title': data.get('project_title')})
+        
+        # Get our resource
+        resource = resources_collection.find_one({"title": resource_title})
 
-    # Verify We got Amount
-    if amount is None:
-        return Response(status=400, response="Malformed Request: No amount provided")
-    
-    # Get our project data and amount checked in
-    info = request.args.get('CheckInOutInfo')
-    
-    if info is None:
-        return Response(status=400, response="Malformed Request: No CheckinOutinfo provided")
-    
-    # Get our project we are checking from
-    project = client["projects"].find_one({'title': info["project_title"]})
-    
-    # Verify that our project has access to this set
-    if project["resources"][resource_title] is None:
-        return Response(status=403, response="Project has not joined resource")
-    
-    # Get our resource
-    resources = client["resources"]
-    resource = resources.find_one({"title": resource_title})
-
-    # Check to see if we have specified resource
-    if resource is None:
-        return Response(status=404, response="Resource not found")
-    
-    # If we are not exceeding capacity TODO: Make this if we are not exceeding the amount specified project has checked in
-    if resource["capacity"] < amount + resource["availability"]:
-        return Response(status=400, response="Tried to check in too many")
-    if project["resources"][resource_title] < amount:
-        return Response(status=400, response="Tried to check in too many")
-    
-    resource["availability"] = resource["availability"] + amount
-    project["resources"][resource_title] -= amount
-    # Update Resource in DB
-    client["resources"].update_one({"title": resource_title}, resource)
-    client["projects"].update_one({'title': info["project_title"]})
-
-
-    
-    return Response(status=200, response=jsonify(resource), content_type="application/json")
+        # Check to see if we have specified resource
+        if resource is None:
+            return jsonify({"msg": "Resource not found"}), 404
+        
+        # If we are not exceeding capacity TODO: Make this if we are not exceeding the amount specified project has checked in
+        if resource["capacity"] < amount + resource["availability"]:
+            return jsonify({"msg": "Tried to check out too many"}), 400
+        if project["resources"][resource_title] < amount:
+            return jsonify({"msg": "Tried to check out too many"}), 400
+        
+        resource["availability"] = resource["availability"] + amount
+        project["resources"][resource_title] -= amount
+        # Update Resource in DB
+        resources_collection.update_one({"title": resource_title}, resource)
+        projects_collection.update_one({'title': info["project_title"]})
+        
+        return jsonify(resource), 200
+    except Exception as e:
+        return jsonify({"msg": str(e)}), 500
