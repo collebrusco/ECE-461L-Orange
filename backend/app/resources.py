@@ -7,12 +7,12 @@ from .auth import check_hash, encode, require_jwt, get_hash, User
 from urllib.parse import unquote
 
 
-@app.route('resources', methods=['GET'])
+@app.route('/resources', methods=['GET'])
 @require_jwt
 def all_resources():
     return jsonify(resources_collection)
     
-@app.route('resources/<string:resource_title>/checkout', methods='[POST]')
+@app.route('/resources/<string:resource_title>/checkout', methods='[POST]')
 @require_jwt
 def checkout(resource_title):
     # if resource_title NULL or not a string
@@ -49,7 +49,7 @@ def checkout(resource_title):
     except Exception as e:
         return jsonify({"msg": str(e)}), 500
 
-@app.route('resources/<string:resource_title>/checkin', methods='[POST]')
+@app.route('/resources/<string:resource_title>/checkin', methods='[POST]')
 @require_jwt
 def checkin(resource_title):
     # if resource_title NULL or not a string
