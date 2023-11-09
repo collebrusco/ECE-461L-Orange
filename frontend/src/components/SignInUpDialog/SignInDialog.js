@@ -31,7 +31,6 @@ function Form(props) {
             enqueueSnackbar("Signed in successfully.", {
               variant: "success",
             });
-            resetForm();
           })
           .catch(() =>
             enqueueSnackbar("Incorrect username or password", {
@@ -40,6 +39,7 @@ function Form(props) {
           )
           .finally(() => {
             setSubmitting(false);
+            resetForm();
           });
       }}
     >
