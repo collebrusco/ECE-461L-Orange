@@ -3,13 +3,13 @@ import { RESOURCES } from "./data";
 const API_URL = "http://127.0.0.1:8888";
 
 export async function signup(username, password) {
-  const formData = new FormData();
-  formData.append("username", username);
-  formData.append("password", password);
   const res = await fetch(`${API_URL}/users`, {
     method: "POST",
     credentials: "include",
-    body: formData,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
   });
   if (!res.ok) {
     throw new Error("Failed to sign up.");
@@ -17,13 +17,13 @@ export async function signup(username, password) {
 }
 
 export async function signin(username, password) {
-  const formData = new FormData();
-  formData.append("username", username);
-  formData.append("password", password);
   const res = await fetch(`${API_URL}/users/login`, {
     method: "POST",
     credentials: "include",
-    body: formData,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
   });
   if (!res.ok) {
     throw new Error("Failed to sign in.");
