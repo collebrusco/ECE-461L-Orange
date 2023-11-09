@@ -1,22 +1,32 @@
 import time
-from flask import make_response, request, Response, jsonify
+from flask import make_response, request, Response, jsonify, json
 from app import app
 from .setup_db import client, users_collection, resources_collection, projects_collection
 from .auth import check_hash, encode, require_jwt, get_hash, User
+from bson import json_util
 
 from urllib.parse import unquote
-
+def parse_json(data):
+    return json.loads(json_util.dumps(data))
 
 @app.route('/resources', methods=['GET'])
 @require_jwt
-def all_resources():
-    return jsonify(resources_collection)
+def all_resources(user: User):
+    resources_list = list(resources_collection.find())
+    #for resource in resources_collection:
+    #    resources_list.append({
+    #        "title": resource["title"],
+    #        "availability": resource["availability"],
+    #        "capacity": resource["capacity"],
+    #    })
+    return parse_json(resources_list)
     
-@app.route('/resources/{resource_title}/checkout', methods=['POST'])
+@app.route('/resources/<string:resource_title>/checkout', methods=['POST'])
 @require_jwt
-def checkout(resource_title):
+def checkout(user: User, resource_title):
     # if resource_title NULL or not a string
     try:
+        resource_title = unquote(resource_title)
         if not resource_title:
             return jsonify({"msg": "Malformed request, no resource title"}), 400
         
@@ -48,11 +58,12 @@ def checkout(resource_title):
     except Exception as e:
         return jsonify({"msg": str(e)}), 500
 
-@app.route('/resources/{resource_title}/checkin', methods=['POST'])
+@app.route('/resources/<string:resource_title>/checkin', methods=['POST'])
 @require_jwt
-def checkin(resource_title):
+def checkin(user: User, resource_title):
     # if resource_title NULL or not a string
     try:
+        resource_title = unquote(resource_title)
         if not resource_title:
             return jsonify({"msg": "Malformed request, no resource title"}), 400
         
