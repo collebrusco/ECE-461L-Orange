@@ -5,13 +5,12 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import DialogLayout from "./DialogLayout";
-import FormField from "./FormField";
+import FormField from "../FormField";
 import { useAuth } from "../AuthProvider.js";
 
 function Form(props) {
   const { onClose } = props;
   const { doSignIn } = useAuth();
-  // const refresh = () => setTimeout(document.location.reload, 1000);
   return (
     <Formik
       initialValues={{ username: "", password: "" }}
@@ -25,27 +24,27 @@ function Form(props) {
         }
         return errors;
       }}
-      onSubmit={(values, { setSubmitting }) => {
-        doSignIn(values.username, values.password).then((ok) => {
-          if (ok) {
-            // alert(
-            //   `Username: ${values.username}\nPassword: ${values.password}\n`
-            // );
+      onSubmit={(values, { setSubmitting, resetForm }) => {
+        doSignIn(values.username, values.password)
+          .then(() => {
             onClose();
-            enqueueSnackbar("Signed up successfully.", {
+            enqueueSnackbar("Signed in successfully.", {
               variant: "success",
             });
-            // refresh();
-          } else {
+          })
+          .catch(() =>
             enqueueSnackbar("Incorrect username or password", {
               variant: "error",
-            });
-          }
-          setSubmitting(false);
-        });
+            })
+          )
+          .finally(() => {
+            setSubmitting(false);
+            resetForm();
+          });
       }}
     >
       {({
+        values,
         errors,
         touched,
         handleChange,
@@ -72,10 +71,11 @@ function Form(props) {
             id="username"
             label="Username"
             name="username"
-            type="username"
+            type="text"
             autoComplete="username"
             hasError={touched.username && !!errors.username}
             errorMessage={errors.username}
+            value={values.username}
             handleChange={handleChange}
             handleBlur={handleBlur}
           />
@@ -89,6 +89,7 @@ function Form(props) {
             autoComplete="current-password"
             hasError={touched.password && !!errors.password}
             errorMessage={errors.password}
+            value={values.password}
             handleChange={handleChange}
             handleBlur={handleBlur}
           />

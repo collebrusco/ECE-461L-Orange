@@ -6,7 +6,7 @@ import SignInOutButton from "./SignInOutButton";
 import { useAuth, AUTH_STATUS } from "./AuthProvider";
 
 function Navbar(props) {
-  const { user, status } = useAuth();
+  const { user: { username }, status } = useAuth();
   const hasSignIn = status === AUTH_STATUS.AUTHENTICATED;
   const { title, children } = props;
 
@@ -22,9 +22,9 @@ function Navbar(props) {
         >
           {title}
         </Typography>
-        {user && (
+        {username && (
           <Typography color="inherit" noWrap sx={{ mr: 1 }}>
-            Welcome, {user}!
+            Welcome, {username}!
           </Typography>
         )}
         {children}

@@ -1,29 +1,29 @@
-// https://github.com/collebrusco/ECE-461L-Orange/blob/main/Database/schema.db
 Table users {
-  id integer [primary key]
-  username varchar
-  password varchar
-  created_at timestamp
-  project_ids list
-}
-
-Table resources {
-  id integer [primary key]
-  capacity integer 
-  availability integer
-  title varchar
-  type varchar
+  _id ObjectID [primary key]
+  username string
+  password string
+  projects Array              # ["Project 1", "Project 2", "Project 3"]
   created_at timestamp
 }
 
 Table projects {
-  id integer [primary key]
-  title varchar
-  description varchar
-  user_ids list
-  creator integer // userid
-  resources list // [resource id -> quantity] length: number of total resources
+  _id ObjectID [primary key]
+  title string
+  description string
+  creator string              # "Alice"
+  users Array                 # ["Alice", "Bob"]
+  resources Object            # resource title -> checked-out quantity
+                              # example: {
+                              #   "HW Set 1": 10,
+                              #   "HW Set 2": 20,
+                              #   "HW Set 3": 0,
+                              # }
 }
 
-
-
+Table resources {
+  _id ObjectID [primary key]
+  title string
+  capacity integer 
+  availability integer
+  created_at timestamp
+}

@@ -27,52 +27,38 @@ export function RequireAuth({ children }) {
 
 export default function AuthProvider({ children }) {
   const [status, setStatus] = React.useState(AUTH_STATUS.PENDING);
-  const [user, setUser] = React.useState("");
+  const [user, setUser] = React.useState({});
 
-  const doSignUp = React.useCallback((username, password) => {
-    setStatus(AUTH_STATUS.PENDING);
-    return signup(username, password).then((ok) => {
+  const updateUser = () => {
+    getCurrentUser().then((user) => {
       setStatus(AUTH_STATUS.PENDING);
-      if (ok) {
+      setUser(user);
+      if (user.username) {
         setStatus(AUTH_STATUS.AUTHENTICATED);
       } else {
         setStatus(AUTH_STATUS.UNAUTHENTICATED);
       }
-      return ok;
     });
+  };
+
+  const doSignUp = React.useCallback((username, password) => {
+    setStatus(AUTH_STATUS.PENDING);
+    return signup(username, password).finally(updateUser);
   }, []);
 
   const doSignIn = React.useCallback((username, password) => {
     setStatus(AUTH_STATUS.PENDING);
-    return signin(username, password).then((ok) => {
-      setStatus(AUTH_STATUS.PENDING);
-      if (ok) {
-        setStatus(AUTH_STATUS.AUTHENTICATED);
-      } else {
-        setStatus(AUTH_STATUS.UNAUTHENTICATED);
-      }
-      return ok;
-    });
+    return signin(username, password).finally(updateUser);
   }, []);
 
   const doSignOut = React.useCallback(() => {
     setStatus(AUTH_STATUS.PENDING);
-    return signout().then(() => {
-      setStatus(AUTH_STATUS.UNAUTHENTICATED);
-    });
+    return signout().finally(updateUser);
   }, []);
 
   React.useEffect(() => {
-    getCurrentUser().then((user) => {
-      setStatus(AUTH_STATUS.PENDING);
-      setUser(user);
-      if (user) {
-        setStatus(AUTH_STATUS.AUTHENTICATED);
-      } else {
-        setStatus(AUTH_STATUS.UNAUTHENTICATED);
-      }
-    });
-  });
+    updateUser();
+  }, []);
 
   const value = React.useMemo(
     () => ({

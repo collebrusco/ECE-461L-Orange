@@ -7,27 +7,27 @@ import Button from "@mui/material/Button";
 import FormField from "./FormField";
 import { useStore } from "./StoreProvider";
 
-function CreateProject() {
-  const { createProject } = useStore();
+function JoinProject() {
+  const { joinProject } = useStore();
   return (
     <Formik
-      initialValues={{ name: "", description: "" }}
+      initialValues={{ projectName: "" }}
       validate={(values) => {
         const errors = {};
-        if (!values.name) {
-          errors.name = "Required";
+        if (!values.projectName) {
+          errors.projectName = "Required";
         }
         return errors;
       }}
       onSubmit={(values, { setSubmitting, resetForm }) => {
-        createProject(values.name, values.description)
+        joinProject(values.projectName)
           .then(() => {
-            enqueueSnackbar("Create project successfully.", {
+            enqueueSnackbar("Joined successfully.", {
               variant: "success",
             });
           })
           .catch(() => {
-            enqueueSnackbar("Failed to create project.", {
+            enqueueSnackbar("Failed to join project.", {
               variant: "error",
             });
           })
@@ -58,30 +58,18 @@ function CreateProject() {
           flexDirection="column"
           gap={1}
         >
-          <Typography fontWeight="bold">Create new project</Typography>
+          <Typography fontWeight="bold">Join project</Typography>
           <FormField
             required
-            id="create-project-name"
-            name="name"
-            label="Name"
+            id="join-project-name"
+            name="projectName"
+            label="Project name"
             type="text"
-            hasError={touched.name && !!errors.name}
-            errorMessage={errors.name}
-            value={values.name}
+            hasError={touched.projectName && !!errors.projectName}
+            errorMessage={errors.projectName}
+            value={values.projectName}
             handleChange={handleChange}
             handleBlur={handleBlur}
-          />
-          <FormField
-            required
-            id="project-description"
-            name="description"
-            label="Description"
-            hasError={touched.description && !!errors.description}
-            errorMessage={errors.description}
-            value={values.description}
-            handleChange={handleChange}
-            handleBlur={handleBlur}
-            multiline
           />
           <Button
             type="submit"
@@ -96,7 +84,7 @@ function CreateProject() {
             variant="contained"
             sx={{ alignSelf: "start" }}
           >
-            Create
+            Join
           </Button>
         </Box>
       )}
@@ -104,4 +92,4 @@ function CreateProject() {
   );
 }
 
-export default CreateProject;
+export default JoinProject;
