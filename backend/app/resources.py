@@ -1,6 +1,6 @@
 import time
 from flask import make_response, request, Response, jsonify
-from app import app, client, mongo_authdb
+from app import app
 from .setup_db import client, users_collection, resources_collection, projects_collection
 from .auth import check_hash, encode, require_jwt, get_hash, User
 
@@ -12,12 +12,11 @@ from urllib.parse import unquote
 def all_resources():
     return jsonify(resources_collection)
     
-@app.route('/resources/<string:resource_title>/checkout', methods='[POST]')
+@app.route('/resources/{resource_title}/checkout', methods=['POST'])
 @require_jwt
 def checkout(resource_title):
     # if resource_title NULL or not a string
     try:
-        resource_title = unquote(resource_title)
         if not resource_title:
             return jsonify({"msg": "Malformed request, no resource title"}), 400
         
@@ -43,18 +42,17 @@ def checkout(resource_title):
         project["resources"][resource_title] += amount
         # Update Resource in DB
         resources_collection.update_one({"title": resource_title}, resource)
-        projects_collection.update_one({'title': info["project_title"]})
+        projects_collection.update_one({'title': data.get('project_title')}, project)
         
         return jsonify(resource), 200
     except Exception as e:
         return jsonify({"msg": str(e)}), 500
 
-@app.route('/resources/<string:resource_title>/checkin', methods='[POST]')
+@app.route('/resources/{resource_title}/checkin', methods=['POST'])
 @require_jwt
 def checkin(resource_title):
     # if resource_title NULL or not a string
     try:
-        resource_title = unquote(resource_title)
         if not resource_title:
             return jsonify({"msg": "Malformed request, no resource title"}), 400
         
@@ -82,7 +80,7 @@ def checkin(resource_title):
         project["resources"][resource_title] -= amount
         # Update Resource in DB
         resources_collection.update_one({"title": resource_title}, resource)
-        projects_collection.update_one({'title': info["project_title"]})
+        projects_collection.update_one({'title': data.get('project_title')}, project)
         
         return jsonify(resource), 200
     except Exception as e:
