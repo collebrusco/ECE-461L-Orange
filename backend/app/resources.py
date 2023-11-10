@@ -10,7 +10,7 @@ def parse_json(data):
     return json.loads(json_util.dumps(data))
 
 @app.route('/resources', methods=['GET'])
-def all_resources(user: User):
+def all_resources():
     resources_list = list(resources_collection.find())
     #for resource in resources_collection:
     #    resources_list.append({
