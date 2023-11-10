@@ -58,7 +58,7 @@ def checkout(user: User, resource_title):
         if resource["availability"] < amount:
             return jsonify({"msg": "Tried to check out too many"}), 400
         
-        resource["availability"] = resource["availability"] + amount
+        resource["availability"] = resource["availability"] - amount
         project["resources"][resource_title] += amount
         # Update Resource in DB
         resources_collection.update_one({"title": resource_title}, resource)
@@ -106,9 +106,9 @@ def checkin(user: User, resource_title):
         
         # If we are not exceeding capacity TODO: Make this if we are not exceeding the amount specified project has checked in
         if resource["capacity"] < amount + resource["availability"]:
-            return jsonify({"msg": "Tried to check out too many"}), 400
+            return jsonify({"msg": "Tried to check in too many"}), 400
         if project["resources"][resource_title] < amount:
-            return jsonify({"msg": "Tried to check out too many"}), 400
+            return jsonify({"msg": "Tried to check in too many"}), 400
         
         resource["availability"] = resource["availability"] + amount
         project["resources"][resource_title] -= amount
