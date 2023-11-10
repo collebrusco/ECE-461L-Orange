@@ -10,7 +10,6 @@ def parse_json(data):
     return json.loads(json_util.dumps(data))
 
 @app.route('/resources', methods=['GET'])
-@require_jwt
 def all_resources(user: User):
     resources_list = list(resources_collection.find())
     #for resource in resources_collection:
@@ -24,7 +23,11 @@ def all_resources(user: User):
 @app.route('/resources/<string:resource_title>/checkout', methods=['POST'])
 @require_jwt
 def checkout(user: User, resource_title):
-    # if resource_title NULL or not a string
+    # Check to see if user in db
+    username =user.username
+    user = users_collection.find_one({'username': username})
+    if user is None:
+        return jsonify({"msg": "User not found"}), 401
     try:
         resource_title = unquote(resource_title)
         if not resource_title:
@@ -44,6 +47,13 @@ def checkout(user: User, resource_title):
         if resource is None:
             return jsonify({"msg": "Resource not found"}), 404
         
+        # Check to see if we have specified project
+        if project is None:
+            return jsonify({"msg": "Project not found"}), 404
+        
+        # Check to see if user has access to project
+        if username not in project["users"]:
+            return jsonify({'msg': 'User does not have access to project'}), 401
         # If we have enough available to check out 
         if resource["availability"] < amount:
             return jsonify({"msg": "Tried to check out too many"}), 400
@@ -61,7 +71,11 @@ def checkout(user: User, resource_title):
 @app.route('/resources/<string:resource_title>/checkin', methods=['POST'])
 @require_jwt
 def checkin(user: User, resource_title):
-    # if resource_title NULL or not a string
+    # Check to see if user in db
+    username =user.username
+    user = users_collection.find_one({'username': username})
+    if user is None:
+        return jsonify({"msg": "User not found"}), 401
     try:
         resource_title = unquote(resource_title)
         if not resource_title:
@@ -80,6 +94,15 @@ def checkin(user: User, resource_title):
         # Check to see if we have specified resource
         if resource is None:
             return jsonify({"msg": "Resource not found"}), 404
+        
+        # Check to see if we have specified project
+        if project is None:
+            return jsonify({"msg": "Project not found"}), 404
+        
+        # Check to see if user has access to project
+        
+        if username not in project["users"]:
+            return jsonify({'msg': 'User does not have access to project'}), 401
         
         # If we are not exceeding capacity TODO: Make this if we are not exceeding the amount specified project has checked in
         if resource["capacity"] < amount + resource["availability"]:
