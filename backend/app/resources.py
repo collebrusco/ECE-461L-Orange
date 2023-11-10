@@ -113,9 +113,9 @@ def checkin(user: User, resource_title):
         resource["availability"] = resource["availability"] + amount
         project["resources"][resource_title] -= amount
         # Update Resource in DB
-        resources_collection.update_one({"title": resource_title}, resource)
-        projects_collection.update_one({'title': data.get('project_title')}, project)
+        resources_collection.update_one({"title": resource_title}, {"$set": {"availability": resource["availability"]}})
+        projects_collection.update_one({'title': data.get('project_title')}, {"$set": {f"resources.{resource_title}": project["resources"][resource_title]}})
         
-        return jsonify(resource), 200
+        return parse_json(resource), 200
     except Exception as e:
         return jsonify({"msg": str(e)}), 500
