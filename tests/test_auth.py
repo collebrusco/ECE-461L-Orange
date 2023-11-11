@@ -1,6 +1,6 @@
 import secrets
 from dataclasses import dataclass
-from flask import request, make_response, Response
+from flask import request, make_response, Response, jsonify
 from jwt import decode, ExpiredSignatureError, InvalidSignatureError, DecodeError
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError, VerifyMismatchError, InvalidHash
@@ -42,12 +42,12 @@ def initialize_test_user():
     except Exception as e:
         print("Failed to connect to MongoDB:", str(e))
 
-    db = client[mongo_authdb]
+    db = client[mongo_dbname]
     collection = db["users"]
 
     if collection.find_one({'username': 'testu'}):
         collection.delete_one({'username': 'testu'})
-    test_udata = {"username": "testu", "password": '$argon2id$v=19$m=65536,t=3,p=4$bM4YHke/OkipD3o56/7s3g$Obmg8PyfzD4mn2tcueC4iM0/qWaWLKgfN+EWE7w8i+A', "created_at": datetime.now(), "project_ids": []}
+    test_udata = {"username": "testu", "password": '$argon2id$v=19$m=65536,t=3,p=4$hExTTPQlfNnStGhW4C+UKg$8KsLfvkk4AuaOTpy3es6aOKXOOkhK/KZIzu5tj8itIo', "created_at": datetime.now(), "project_ids": []}
     collection.insert_one(test_udata)
 
 
@@ -57,20 +57,24 @@ def test_url():
 
 def test_login_nouser():
 	initialize_test_user()
+	headers = {'Content-Type': 'application/json'}
 	form = {
 	    'username': 'NON-EXISTENT-USER',
 	    'password': 'anything',
 	}
-	response = requests.post('http://localhost:8888/login', data=form)
+	response = requests.post('http://localhost:8888/users/login', json=form, headers=headers)
 	check.equal(response.status_code, 403)
+	check.equal(response.text, 'Invalid username or password')
 
 def test_login_success():
 	initialize_test_user()
+	headers = {'Content-Type': 'application/json'}
 	form = {
 	    'username': 'testu',
 	    'password': 'testpass',
 	}
-	response = requests.post('http://localhost:8888/login', data=form)
+	response = requests.post('http://localhost:8888/users/login', json=form, headers=headers)
 	check.equal(response.status_code, 200)
+	check.equal(response.text, "OK")
 
     

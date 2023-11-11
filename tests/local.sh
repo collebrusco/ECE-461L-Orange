@@ -1,5 +1,5 @@
 #!/bin/bash
-
+clear
 # Set environment variables for this subshell
   export MONGO_HOST=localhost
   export MONGO_PORT=27017
