@@ -52,22 +52,21 @@ def checkout(user: User, resource_title):
             return jsonify({"msg": "Project not found"}), 404
         
         # Check to see if user has access to project
-        users = project["users"]
-        if username not in users:
+        if username not in project["users"]:
             return jsonify({'msg': 'User does not have access to project'}), 401
         # If we have enough available to check out 
-        if int(resource["availability"]) < int(amount):
+        if resource["availability"] < amount:
             return jsonify({"msg": "Tried to check out too many"}), 400
         
-        resource["availability"] = str(int(resource["availability"]) - int(amount))
-        project["resources"][resource_title] = str(int(project["resources"][resource_title]) + int(amount))
+        resource["availability"] = resource["availability"] - amount
+        project["resources"][resource_title] += amount
         # Update Resource in DB
         resources_collection.update_one({"title": resource_title}, {"$set": {"availability": resource["availability"]}})
         projects_collection.update_one({'title': data.get('project_title')}, {"$set": {f"resources.{resource_title}": project["resources"][resource_title]}})
         
         return parse_json(resource), 200
     except Exception as e:
-        return jsonify({"msg": str(e) + e.with_traceback}), 500
+        return jsonify({"msg": str(e)}), 500
 
 @app.route('/resources/<string:resource_title>/checkin', methods=['POST'])
 @require_jwt
@@ -101,22 +100,22 @@ def checkin(user: User, resource_title):
             return jsonify({"msg": "Project not found"}), 404
         
         # Check to see if user has access to project
-        users = project["users"]
-        if username not in users:
+        
+        if username not in project["users"]:
             return jsonify({'msg': 'User does not have access to project'}), 401
-        am_res = int(amount) + int(resource["availability"])
+        
         # If we are not exceeding capacity TODO: Make this if we are not exceeding the amount specified project has checked in
-        if int(resource["capacity"]) < int(amount):
+        if resource["capacity"] < amount + resource["availability"]:
             return jsonify({"msg": "Tried to check in too many"}), 400
-        if int(project["resources"][resource_title]) < int(amount):
+        if project["resources"][resource_title] < amount:
             return jsonify({"msg": "Tried to check in too many"}), 400
         
-        resource["availability"] = str(int(resource["availability"]) + int(amount))
-        project["resources"][resource_title] = str(int(project["resources"][resource_title]) - int(amount))
+        resource["availability"] = resource["availability"] + amount
+        project["resources"][resource_title] -= amount
         # Update Resource in DB
         resources_collection.update_one({"title": resource_title}, {"$set": {"availability": resource["availability"]}})
         projects_collection.update_one({'title': data.get('project_title')}, {"$set": {f"resources.{resource_title}": project["resources"][resource_title]}})
         
         return parse_json(resource), 200
     except Exception as e:
-        return jsonify({"msg": str(e) + e.with_traceback}), 500
+        return jsonify({"msg": str(e)}), 500
