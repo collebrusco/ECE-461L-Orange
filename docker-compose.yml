@@ -4,8 +4,11 @@ services:
     image: "spencshis/ecl-461l-orange:frontend"
     build:
       context: ./frontend
+      args:
+        - ENV=release
     ports:
       - "3000:3000"
+
 
   backend:
     image: "spencshis/ecl-461l-orange:backend"
