@@ -14,7 +14,9 @@ export default function HardwareUsage(props) {
   const { resources, checkout, checkin } = useStore();
   React.useEffect(() => {
     const resource = resources.find((resource) => resource.title === name);
-    setAvailability(resource.availability);
+    if (resource) {
+      setAvailability(resource.availability);
+    }
   }, [resources, name]);
 
   const handleCheckOut = () => {
