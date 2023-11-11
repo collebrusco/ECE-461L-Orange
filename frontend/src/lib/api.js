@@ -2,15 +2,14 @@ import { RESOURCES } from "./data";
 
 const API_URL = process.env.REACT_APP_ENV === 'development' ? "http://127.0.0.1:8888" : 'https://teamorange.duckdns.org/api';
 
-
 export async function signup(username, password) {
-  const formData = new FormData();
-  formData.append("username", username);
-  formData.append("password", password);
   const res = await fetch(`${API_URL}/users`, {
     method: "POST",
     credentials: "include",
-    body: formData,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
   });
   if (!res.ok) {
     throw new Error("Failed to sign up.");
@@ -18,13 +17,13 @@ export async function signup(username, password) {
 }
 
 export async function signin(username, password) {
-  const formData = new FormData();
-  formData.append("username", username);
-  formData.append("password", password);
   const res = await fetch(`${API_URL}/users/login`, {
     method: "POST",
     credentials: "include",
-    body: formData,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
   });
   if (!res.ok) {
     throw new Error("Failed to sign in.");
@@ -49,11 +48,6 @@ export async function signout() {
   if (!res.ok) {
     throw new Error("Failed to sign out.");
   }
-}
-
-function getProjects() {
-  const projects = localStorage.getItem("projects");
-  return projects ? JSON.parse(projects) : [];
 }
 
 export async function getUserProjects() {
@@ -93,42 +87,37 @@ export async function joinProject(projectName) {
 }
 
 export async function getResources() {
-  const resources = localStorage.getItem("resources");
-  return resources ? JSON.parse(resources) : RESOURCES;
+  const res = await fetch(`${API_URL}/resources`);
+  if (!res.ok) {
+    return [];
+  }
+  return res.json();
 }
 
 export async function checkout(resource_name, quantity, project_name) {
-  const resources = await getResources();
-  const resource = resources.find(
-    (resource) => resource.title === resource_name
-  );
-
-  if (resource.availability < quantity) {
-    throw new Error("Too many to check out.");
+  const res = await fetch(`${API_URL}/resources/${resource_name}/checkout`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ project_title: project_name, amount: quantity }),
+  });
+  if (!res.ok) {
+    throw new Error("Failed to checkout.");
   }
-  resource.availability -= quantity;
-
-  const projects = await getProjects();
-  const project = projects.find((project) => project.title === project_name);
-  project.resources[resource_name] += quantity;
-  localStorage.setItem("resources", JSON.stringify(resources));
-  localStorage.setItem("projects", JSON.stringify(projects));
 }
 
 export async function checkin(resource_name, quantity, project_name) {
-  const resources = await getResources();
-  const resource = resources.find(
-    (resource) => resource.title === resource_name
-  );
-
-  if (resource.availability + quantity > resource.capacity) {
-    throw new Error("Too many to check in.");
+  const res = await fetch(`${API_URL}/resources/${resource_name}/checkin`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ project_title: project_name, amount: quantity }),
+  });
+  if (!res.ok) {
+    throw new Error("Failed to checkin.");
   }
-  resource.availability += quantity;
-
-  const projects = await getProjects();
-  const project = projects.find((project) => project.title === project_name);
-  project.resources[resource_name] -= quantity;
-  localStorage.setItem("resources", JSON.stringify(resources));
-  localStorage.setItem("projects", JSON.stringify(projects));
 }

@@ -63,10 +63,17 @@ def require_jwt(f):
 
 @app.route('/users/login', methods=['POST'])
 def login():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    if username is None or password is None:  # request form wasn't set properly
-        return Response(status=400, response="Specify both a username and password")
+    if not request.is_json:
+        return Response(status=400, response="Expected application/json request")
+
+    data = request.json
+    # return type(data.get("username"))
+
+    if "username" not in data or "password" not in data:
+        return Response(status=400, response="Malformed request")
+
+    username = data.get('username')
+    password = data.get('password')
 
     # check if user exists
     m = client
@@ -92,15 +99,23 @@ def login():
         resp.set_cookie("auth_jwt", token)
         return resp
 
-    return Response(status="404", response="Username or password incorrect")
+    return Response(status=400, response="Forbidden")
 
-
+  
+  
 @app.route('/users', methods=['POST'])
 def register():
-    username = request.form.get("username")
-    password = request.form.get("password")
-    if username is None or password is None:  # request form wasn't set properly
-        return Response(status=400, response="Specify both a username and password")
+    if not request.is_json:
+        return Response(status=400, response="Expected application/json request")
+
+    data = request.json
+    # return type(data.get("username"))
+
+    if "username" not in data or "password" not in data:
+        return Response(status=400, response="Malformed request")
+
+    username = data.get('username')
+    password = data.get('password')
 
     m = client
     users = m[mongo_dbname]["users"]

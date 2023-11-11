@@ -31,6 +31,19 @@ users_collection = db["users"]
 resources_collection = db["resources"]  
 projects_collection = db["projects"]  
 
+# Initialize resources
+sample_resources = [
+    {"capacity": 100, "availability": 100, "title": "HW Set 1", "created_at": datetime.now()},
+    {"capacity": 200, "availability": 200, "title": "HW Set 2", "created_at": datetime.now()},
+    {"capacity": 300, "availability": 300, "title": "HW Set 3", "created_at": datetime.now()}
+]
+# Check if the collection already exists
+if resources_collection.find_one():
+    print("Resources collection already initialized.")
+else:
+    # Insert data into MongoDB collections
+    print("Resources collection created.")
+    resources_collection.insert_many(sample_resources)
 
 # Initialize mongodb
 @app.route('/initialize-mongodb', methods=['GET'])
@@ -41,8 +54,10 @@ def initialize_mongodb():
 
    # Sample data
     sample_users = [
-        {"username": "user1", "password": "password1", "created_at": datetime.now(), "projects": []},
-        {"username": "user2", "password": "password2", "created_at": datetime.now(), "projects": []}
+        # the password is a hashed version of "password1"
+        {"username": "user1", "password": '$argon2id$v=19$m=65536,t=3,p=4$9rfKjqg1IIsFNganHXQquw$ozPO5qzrEBq4hCALxmWH6+pXXmyvmon7R1uyKc/dCEI', "created_at": datetime.now(), "projects": []},
+        # the password is a hashed version of "password2"
+        {"username": "user2", "password": '$argon2id$v=19$m=65536,t=3,p=4$i6gb55DAJ54Ub/RAwxyw2w$2d8mfkSZybD4xoJnw8UrIvs6W3r8u4ad1haYXLQx5gI', "created_at": datetime.now(), "projects": []}
     ]
 
     sample_resources = [
