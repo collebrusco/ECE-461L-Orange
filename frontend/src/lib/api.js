@@ -1,6 +1,5 @@
 import { RESOURCES } from "./data";
 
-console.log(process.env.REACT_APP_ENV);
 const API_URL = process.env.REACT_APP_ENV === 'development' ? "http://127.0.0.1:8888" : 'https://teamorange.duckdns.org/api';
 
 

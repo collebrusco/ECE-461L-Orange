@@ -1,6 +1,6 @@
 FROM node:18-alpine
 
-ENV REACT_APP_ENV development
+ENV REACT_APP_ENV production
 
 WORKDIR /frontend
 COPY . .

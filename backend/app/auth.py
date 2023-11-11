@@ -92,6 +92,8 @@ def login():
         resp.set_cookie("auth_jwt", token)
         return resp
 
+    return Response(status="404", response="Username or password incorrect")
+
 
 @app.route('/users', methods=['POST'])
 def register():
