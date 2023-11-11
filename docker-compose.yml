@@ -4,8 +4,6 @@ services:
     image: "spencshis/ecl-461l-orange:frontend"
     build:
       context: ./frontend
-      args:
-        - ENV=development
     ports:
       - "3000:3000"
 

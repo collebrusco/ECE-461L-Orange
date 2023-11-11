@@ -1,8 +1,6 @@
 FROM node:18-alpine
 
-ARG ENV
-
-ENV REACT_APP_ENV $ENV
+ENV REACT_APP_ENV development
 
 WORKDIR /frontend
 COPY . .
