@@ -5,3 +5,4 @@ pymongo
 flask_jwt_extended
 pyjwt
 argon2-cffi
+waitress
