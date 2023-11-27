@@ -100,6 +100,7 @@ def test_project_get():
 
 	response = requests.get('http://localhost:8888/projects', headers=headers, cookies=cookies)
 	check.equal(response.status_code, 200)
+	check.equal(response.text, "OK")
 
 
 
