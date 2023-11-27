@@ -22,7 +22,7 @@ function CreateProject() {
       onSubmit={(values, { setSubmitting, resetForm }) => {
         createProject(values.name, values.description)
           .then(() => {
-            enqueueSnackbar("Create project successfully.", {
+            enqueueSnackbar("Created project successfully.", {
               variant: "success",
             });
           })

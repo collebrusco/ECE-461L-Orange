@@ -30,19 +30,19 @@ export default function StoreProvider({ children }) {
 
   // Exported functions
   const createProject = (name, description) => {
-    return createProjectApi(name, description).then(updateProjects);
+    return createProjectApi(name, description).finally(updateProjects);
   };
   const joinProject = (projectName) => {
-    return joinProjectApi(projectName).then(updateProjects);
+    return joinProjectApi(projectName).finally(updateProjects);
   };
   const checkout = (resource_name, quantity, project_name) => {
-    return checkoutApi(resource_name, quantity, project_name).then(() => {
+    return checkoutApi(resource_name, quantity, project_name).finally(() => {
       updateProjects();
       updateResources();
     });
   };
   const checkin = (resource_name, quantity, project_name) => {
-    return checkinApi(resource_name, quantity, project_name).then(() => {
+    return checkinApi(resource_name, quantity, project_name).finally(() => {
       updateProjects();
       updateResources();
     });

@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8888";
+const API_URL = process.env.REACT_APP_ENV === 'development' ? "http://127.0.0.1:8888" : 'https://teamorange.duckdns.org/api';
 
 export async function signup(username, password) {
   const res = await fetch(`${API_URL}/users`, {

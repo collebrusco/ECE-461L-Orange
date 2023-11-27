@@ -14,7 +14,9 @@ export default function HardwareUsage(props) {
   const { resources, checkout, checkin } = useStore();
   React.useEffect(() => {
     const resource = resources.find((resource) => resource.title === name);
-    setAvailability(resource.availability);
+    if (resource) {
+      setAvailability(resource.availability);
+    }
   }, [resources, name]);
 
   const handleCheckOut = () => {
@@ -25,7 +27,9 @@ export default function HardwareUsage(props) {
       enqueueSnackbar("Too many to check out.", { variant: "error" });
       return;
     } else {
-      checkout(name, quantity, projectName);
+      checkout(name, quantity, projectName)
+        .then(() => enqueueSnackbar("Checked out successfully.", { variant: "success" }))
+        .catch(() => enqueueSnackbar("Checkout failed.", { variant: "error" }));
     }
   };
 
@@ -37,8 +41,10 @@ export default function HardwareUsage(props) {
       enqueueSnackbar("Too many to check in.", { variant: "error" });
       return;
     } else {
-      checkin(name, quantity, projectName);
-    }
+      checkin(name, quantity, projectName)
+        .then(() => enqueueSnackbar("Checked in successfully.", { variant: "success" }))
+        .catch(() => enqueueSnackbar("Checkin failed.", { variant: "error" }));
+  }
   };
 
   const onQuantityChange = (e) => {
