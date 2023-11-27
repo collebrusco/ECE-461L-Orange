@@ -3,5 +3,6 @@ Main entry point for the backend
 """
 
 from app import app
+from waitress import serve
 if __name__ == '__main__':
-	app.run(port=5000, host='0.0.0.0', debug=True)
+	serve(app, host='0.0.0.0', port=5000)
